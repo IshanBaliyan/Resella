@@ -1,4 +1,4 @@
-package Resella;
+package resella;
 
 public class Resella {
 

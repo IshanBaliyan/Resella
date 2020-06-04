@@ -1,5 +1,5 @@
 // Tutorial: https://stackabuse.com/web-scraping-the-java-way/
-package Resella;
+package resella;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ public class JSoupScraperSample {
 		        // Get the full name of the repository
 		        String repositoryGithubName = repository.getElementsByClass("repo-item-full-name").text();
 
-		        // The reposiory full name contains brackets that we remove first before generating the valid Github link.
+		        // The repository full name contains brackets that we remove first before generating the valid Github link.
 		        String repositoryGithubLink = "https://github.com/" + repositoryGithubName.replaceAll("[()]", "");
 
 		        // Format and print the information to the console

@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/junit-4.12.jar"/>
 	<classpathentry kind="lib" path="lib/SimpleIO.jar"/>
 	<classpathentry kind="lib" path="lib/xom-1.2.11.jar"/>
+	<classpathentry kind="lib" path="lib/jfoenix-8.0.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

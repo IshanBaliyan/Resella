@@ -1,6 +1,6 @@
-package Resella;
+package resella;
 
-public class RecentSearchesController {
+public class ProductListing {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

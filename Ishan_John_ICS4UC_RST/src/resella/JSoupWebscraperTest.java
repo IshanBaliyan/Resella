@@ -11,64 +11,49 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JSoupWebscraperTest {
+	// TODO: manage different locations
+	static String location = "ottawa";
+	static String keywords = "corvette";
+	static String searchID = "k0l1700185";
 
-	public JSoupWebscraperTest() {
-		// TODO Auto-generated constructor stub
-	}
-	 public static void main(String[] args) {
-		    try {
-		      // Here we create a document object and use JSoup to fetch the website
-		      Document doc = Jsoup.connect("https://www.ebay.com/sch/i.html?_from=R40&_nkw=corvette&_sacat=0&LH_TitleDesc=0&_fosrp=2&_odkw=galaxy+note+8&_ipg=100").get();
-
-//		      // With the document fetched, we use JSoup's title() method to fetch the title
-//		      System.out.printf("Title: %s\n", doc.title());
-		      
-		      // Get the list of repositories
-		      Elements numMatches = doc.getElementsByClass("srp-controls__count-heading");
-		      
-		      
-		      System.out.println(numMatches.text());
-		      Pattern r = Pattern.compile("^([0-9],?)+");
-		      Matcher m = r.matcher(numMatches.text());
-		      if (m.find( )) {
-		          System.out.println(m.group(0).replaceAll(",", ""));
-		      }
-		      
-		      // Get the list of repositories
-		      Elements searchItems = doc.getElementsByClass("s-item__image");
-		      
-		      
-		      //Canadian repo code:rsHdr
-
-		      /**
-		       * For each repository, extract the following information:
-		       * 1. Title
-		       * 2. Number of issues
-		       * 3. Description
-		       * 4. Full name on github
-		       */
-		      
-		      
-		      for (Element searchItem : searchItems) {
-		      
-		    	  Elements links = searchItem.select("a[href]");
-		          for (Element link : links) {
-		            
-		        	  String href = link.attr("href");
-		            
-		            if(!href.isEmpty()) {
-		            	
-		            	// get the value from the href attribute
-			            System.out.println("\nlink: " + href);
-		            }
-		          }
-		    	  
-		      }
-
-		    // In case of any IO errors, we want the messages written to the console
-		    } catch (IOException e) {
-		      e.printStackTrace();
-		    }
+	public static void main(String[] args) {
+	    try {
+	    	// TODO: check what ?dc=true means
+	      // Here we create a document object and use JSoup to fetch the website
+	      Document doc = Jsoup.connect("https://www.kijiji.ca/b-" + location + "/" + keywords + "/" + searchID + "?dc=true" + "&sort=priceAsc").get();
+	      
+	      // Get the list of repositories
+	      Elements numMatches = doc.getElementsByClass("showing");
+	      
+	      
+	      System.out.println(numMatches.text());
+	      Pattern r = Pattern.compile("([0-9],?)+ Ad");
+	      Matcher m = r.matcher(numMatches.text());
+	      if (m.find()) {
+	          System.out.println(m.group(0).replaceAll("[ Ad,]", ""));
+	      }
+	      
+	      // Get the list of repositories
+	      Elements searchItems = doc.getElementsByClass("regular-ad");
+	      
+	      for (Element searchItem : searchItems) {	      
+	    	  Elements links = searchItem.select("a[href]");
+	          for (Element link : links) {
+	            
+	        	  String href = link.attr("href");
+	            
+	            if(!href.isEmpty()) {
+	            	
+	            	// get the value from the href attribute
+		            System.out.println("\nlink: " + "https://www.kijiji.ca" + href);
+	            }
+	          }
+	    	  
+	      }
+	
+	    // In case of any IO errors, we want the messages written to the console
+	    } catch (IOException e) {
+	      e.printStackTrace();
+	    }
 	}
 }
-

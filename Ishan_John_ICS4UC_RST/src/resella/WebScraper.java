@@ -34,10 +34,10 @@ public class WebScraper {
 	 */
 	public void scrapeListings(){
 		//item results URL declared and assigned to variable from keywords searched by the user
-		String activeEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords;
+		String activeEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords + "&_sop=15";
 		activeAdListings.addAll(scrapeSearchResultsEBay(activeEBayResultsURL));
 		
-		String soldEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords + "&LH_Sold=1";
+		String soldEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords + "&LH_Sold=1" + "&_ipg=100" + "&_sop=16";
 		soldAdListings.addAll(scrapeSearchResultsEBay(soldEBayResultsURL));
 	}
 
@@ -74,7 +74,6 @@ public class WebScraper {
 
 			//Canadian repo code:rsHdr
 
-
 			for (Element searchItem : searchItems) {
 
 				Elements links = searchItem.select("a[href]");
@@ -106,6 +105,34 @@ public class WebScraper {
 	 * @param productURL The URL for the product listing
 	 */
 	private ProductListing scrapeListingEBay(String productURL) {
+		
+		productURL = "https://www.ebay.com/itm/2020-Chevrolet-Corvette-Stingray-Z51-LT1/303583464119?hash=item46aefc0ab7:g:sPIAAOSwNU9e0~AS";
+		
+		try {
+			// Here we create a document object and use JSoup to fetch the website
+			Document doc = Jsoup.connect(productURL).get();
+
+			Elements titleElement = doc.getElementsByClass("it-ttl");
+			String title = doc.getElementsByClass("srp-controls__count-heading").text().replaceFirst("Details about ", "");
+			
+			Elements priceElement = doc.getElementsByClass("vi-mskumap-none");
+			int price = Integer.parseInt(doc.getElementsByClass("srp-controls__count-heading").text().replaceFirst("Details about ", ""));
+			
+			System.out.println("Item name: " + title);
+			System.out.println("Item price: " + price);
+			
+			//img url, listingtype (auction or buyitnow)
+			//description (filter keywords - broken, needs repair, etc..)
+			//
+			
+
+			
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		return null;
 	}
 
@@ -116,6 +143,7 @@ public class WebScraper {
 	 */
 	private void scrapeSearchResultsKijiji(String searchURL) {
 
+		
 
 	}
 

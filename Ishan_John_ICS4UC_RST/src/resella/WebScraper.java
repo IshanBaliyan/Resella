@@ -18,7 +18,7 @@ public class WebScraper {
 	//	private ArrayList<ProductListings> activeAdListings;
 	//	private ArrayList<ProductListings> soldAdListings;
 
-
+ 
 	/**
 	 * Constructor for adding keywords
 	 * 

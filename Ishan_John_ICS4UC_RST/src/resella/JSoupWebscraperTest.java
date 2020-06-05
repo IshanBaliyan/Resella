@@ -36,7 +36,8 @@ public class JSoupWebscraperTest {
 	      // Get the list of repositories
 	      Elements searchItems = doc.getElementsByClass("regular-ad");
 	      
-	      for (Element searchItem : searchItems) {	      
+	      for (Element searchItem : searchItems){
+	      
 	    	  Elements links = searchItem.select("a[href]");
 	          for (Element link : links) {
 	            
@@ -45,11 +46,25 @@ public class JSoupWebscraperTest {
 	            if(!href.isEmpty()) {
 	            	
 	            	// get the value from the href attribute
-		            System.out.println("\nlink: " + "https://www.kijiji.ca" + href);
+		            System.out.println("\nlink: "+ "https://www.kijiji.ca"  + href);
 	            }
 	          }
-	    	  
 	      }
+	    Document listing = Jsoup.connect("https://www.kijiji.ca/v-classic-cars/oshawa-durham-region/1984-corvette/1503692990").get();
+	    
+	    // Title:
+	    Element title = listing.getElementsByClass("title-2323565163").first();
+	    System.out.println("Title: " + title.text());
+	    
+	    // Price:
+	    Element price = listing.getElementsByClass("currentPrice-2842943473").first();
+	    String dollars = price.text().replaceAll("[\\$,]", "");
+	    System.out.println("Price: " + Double.parseDouble(dollars));
+	    
+	    // Image src
+		Element presentation = listing.getElementById("mainHeroImage");
+		Element image = presentation.getElementsByTag("img").first();
+		System.out.println("Image src: " + image.attr("src"));
 	
 	    // In case of any IO errors, we want the messages written to the console
 	    } catch (IOException e) {

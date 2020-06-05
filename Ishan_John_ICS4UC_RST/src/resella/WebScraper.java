@@ -2,6 +2,7 @@ package resella;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,47 +15,57 @@ public class WebScraper {
 
 	//Declaring variables for use in class
 	private int numListings;
-	private String keyWords;
-	//	private ArrayList<ProductListings> activeAdListings;
-	//	private ArrayList<ProductListings> soldAdListings;
+	private String keywords;
+	private ArrayList<ProductListing> activeAdListings;
+	private ArrayList<ProductListing> soldAdListings;
 
  
 	/**
 	 * Constructor for adding keywords
 	 * 
-	 * @param keyWords	The keywords or the "search text" that the user is using to search the item on the program 
+	 * @param keywords	The keywords or the "search text" that the user is using to search the item on the program 
 	 */
-	public WebScraper(String keyWords) {
-		this.keyWords = keyWords;
+	public WebScraper(String keywords) {
+		this.keywords = keywords;
 	}
 
 	/**
 	 * Method that scrapes the listings
 	 */
 	public void scrapeListings(){
+		//item results URL declared and assigned to variable from keywords searched by the user
+		String activeEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords;
+		activeAdListings.addAll(scrapeSearchResultsEBay(activeEBayResultsURL));
+		
+		String soldEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords + "&LH_Sold=1";
+		soldAdListings.addAll(scrapeSearchResultsEBay(soldEBayResultsURL));
+	}
+
+
+	/**
+	 * This method scrapes search results on EBay
+	 * 
+	 * @param searchURL The search URL for the keywords
+	 * @return ArrayList<ProductListing>
+	 */
+	private ArrayList<ProductListing> scrapeSearchResultsEBay(String searchURL) {
+		ArrayList<ProductListing> listingSearchResults = new ArrayList<ProductListing>();
 		try {
-
-			//item results URL declared and assigned to variable from keywords searched by the user
-			String itemResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keyWords + "&_sacat=0&LH_TitleDesc=0&_fosrp=2&_odkw=galaxy+note+8&_ipg=100";
-
 			// Here we create a document object and use JSoup to fetch the website
-			Document doc = Jsoup.connect(itemResultsURL).get();
-
-
-			// With the document fetched, we use JSoup's title() method to fetch the title
-			//		      System.out.printf("Title: %s\n", doc.title());
+			Document doc = Jsoup.connect(searchURL).get();
 
 			// Get the list of repositories
-			Elements numMatches = doc.getElementsByClass("srp-controls__count-heading");
+			Elements numResults = doc.getElementsByClass("srp-controls__count-heading");
 
 			//Printing the message for the number of results for the item
-			System.out.println(numMatches.text());
+			System.out.println(numResults.text());
 			Pattern r = Pattern.compile("^([0-9],?)+");
-			Matcher m = r.matcher(numMatches.text());
-
+			Matcher m = r.matcher(numResults.text());
 
 			if (m.find( )) {
-				System.out.println(m.group(0).replaceAll(",", ""));
+				int numListings = Integer.parseInt(m.group(0).replaceAll(",", ""));
+				System.out.println(numListings);
+				this.numListings += numListings;
 			}
 
 			// Get the list of repositories
@@ -75,35 +86,18 @@ public class WebScraper {
 
 						// get the value from the href attribute
 						System.out.println("\nlink: " + href);
+						listingSearchResults.add(scrapeListingEBay(href));
+						
 					}
 				}
 
 			}
-			/**
-			 * For each repository, extract the following information:
-			 * 1. Title
-			 * 2. Number of issues
-			 * 3. Description
-			 * 4. Full name on github
-			 */
 
 			// In case of any IO errors, we want the messages written to the console
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-	}
-
-
-	/**
-	 * This method scrapes search results on EBay
-	 * 
-	 * @param searchURL The search URL for the keywords
-	 */
-	private void scrapeSearchResultsEBay(String searchURL) {
-
-
-
+		return listingSearchResults;
 	}
 
 	/**
@@ -111,10 +105,8 @@ public class WebScraper {
 	 * 
 	 * @param productURL The URL for the product listing
 	 */
-	private void scrapeListingEBay(String productURL) {
-
-
-
+	private ProductListing scrapeListingEBay(String productURL) {
+		return null;
 	}
 
 	/**

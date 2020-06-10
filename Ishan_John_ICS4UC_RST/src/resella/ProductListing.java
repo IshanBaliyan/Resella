@@ -21,6 +21,9 @@ public class ProductListing {
 	private int listingType;
 	private int marketplace;
 	private boolean isSold;
+	private String orderMethod;
+	private String location;
+	
 	
 	// Useful constants
 	public static final int BUY_IT_NOW_LISTING = 0;
@@ -39,6 +42,8 @@ public class ProductListing {
 	 * Default values:
 	 * imageURL: the ebay logo, https://ir.ebaystatic.com/cr/v/c1/ebay-logo-1-1200x630-margin.png
 	 * price: 0.0
+	 * orderMethod the method of ordering the listing (i.e. shipping with shipping price or pickup)
+	 * location the location of the listing
 	 * title: the String "UNSET"
 	 * listingURL: eBya's home page, https://www.ebay.com/
 	 * listingType: Buy It Now
@@ -47,23 +52,27 @@ public class ProductListing {
 	 * 
 	 */
 	public ProductListing () {
-		this("https://ir.ebaystatic.com/cr/v/c1/ebay-logo-1-1200x630-margin.png", 0.0, "UNSET", "https://www.ebay.com/", BUY_IT_NOW_LISTING, EBAY, new ArrayList<String>());
+		this("https://ir.ebaystatic.com/cr/v/c1/ebay-logo-1-1200x630-margin.png", 0.0, "UNSET", "UNSET", "UNSET", "https://www.ebay.com/", BUY_IT_NOW_LISTING, EBAY, new ArrayList<String>());
 	}
 	
 	/**
 	 * Creates a new product listing with the specified parameters
 	 * @param imageURL  the URL of the image
 	 * @param price  the listing price
+	 * @param orderMethod the method of ordering the listing (i.e. shipping with shipping price or pickup)
+	 * @param location the location of the listing
 	 * @param title  the listing title
 	 * @param listingURL  the listing's URL
 	 * @param listingType  the listing type: 0 for Buy it Now, 1 for auction listings
 	 * @param marketplace  the marketplace where the listing can be found (ex:
 	 * @param tags
 	 */
-	public ProductListing (String imageURL, double price, String title, String listingURL, int listingType, int marketplace, ArrayList<String> tags) {
+	public ProductListing (String imageURL, double price, String orderMethod, String location, String title, String listingURL, int listingType, int marketplace, ArrayList<String> tags) {
 		// Initialize all the variables
 		imgListing = new Image(imageURL);
 		this.price = price;
+		this.orderMethod = orderMethod;
+		this.location = location;
 		this.title = title;
 		this.listingType = listingType;
 		this.marketplace = marketplace;

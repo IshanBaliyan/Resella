@@ -77,26 +77,19 @@ public class WebScraper {
 			// Get the list of repositories
 			Elements searchItems = doc.getElementsByClass("s-item__image");
 
-			// Canadian repo code:rsHdr
-
+			// Canadian repo code:rsHdr (not used here but for future reference)
 			for (Element searchItem : searchItems) {
-
 				Elements links = searchItem.select("a[href]");
 				for (Element link : links) {
-
 					String href = link.attr("href");
-
 					if (!href.isEmpty()) {
 
 						// get the value from the href attribute
 						System.out.println("\nlink: " + href);
 						listingSearchResults.add(scrapeListingEBay(href));
-
 					}
 				}
-
 			}
-
 			// In case of any IO errors, we want the messages written to the console
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -110,33 +103,49 @@ public class WebScraper {
 	 * @param productURL The URL for the product listing
 	 */
 	private ProductListing scrapeListingEBay(String productURL) {
-
-		productURL = "https://www.ebay.com/itm/2020-Chevrolet-Corvette-Stingray-Z51-LT1/303583464119?hash=item46aefc0ab7:g:sPIAAOSwNU9e0~AS";
-
+		ProductListing scrapedListing = new ProductListing();
+		ArrayList<String> tags = new ArrayList<String>();
 		try {
+			
 			// Here we create a document object and use JSoup to fetch the website
 			Document doc = Jsoup.connect(productURL).get();
 
+			// Scrape title:
 			Elements titleElement = doc.getElementsByClass("it-ttl");
-			String title = doc.getElementsByClass("srp-controls__count-heading").text().replaceFirst("Details about ",
-					"");
+			String title = titleElement.text().replaceFirst("Details about ", "");
 
-			Elements priceElement = doc.getElementsByClass("vi-mskumap-none");
-			int price = Integer.parseInt(
-					doc.getElementsByClass("srp-controls__count-heading").text().replaceFirst("Details about ", ""));
+			// Scrape price:
+			Element priceElement = doc.getElementById("vi-mskumap-none");
+			double price = Double.parseDouble(priceElement.text().replaceFirst("Details about ", ""));
 
-			System.out.println("Item name: " + title);
-			System.out.println("Item price: " + price);
+			//Scrape image URL
+			Element imageElement = doc.getElementById("icImg");
+			String imgURL = imageElement.attr("src"); 
 
-			// img url, listingtype (auction or buyitnow)
-			// description (filter keywords - broken, needs repair, etc..)
-			//
+			//Scrape shipping price
+			Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
+			Pattern r = Pattern.compile("[0-9]+\\.[0-9]+");
+			Matcher m = r.matcher(shippingPriceElement.text());
+
+			//Reformat shipping price to a double
+			double shippingPrice = 0;
+			if (m.find( )) {
+				shippingPrice = Double.parseDouble(m.group(0).replaceAll(",", ""));
+			}
+			
+			//Scrape the location of the listing
+			Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
+			String location = availableLocation.text();
+			
+			// Create scrapedListing
+			scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
+					ProductListing.KIJIJI, tags);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		return scrapedListing;
 	}
 
 	/**
@@ -211,10 +220,18 @@ public class WebScraper {
 			Element presentation = listing.getElementById("mainHeroImage");
 			Element image = presentation.getElementsByTag("img").first();
 			String imageURL = image.attr("src");
+
+			String orderMethod = "PICK UP ONLY";
+			
+			//Scrape the location of the listing
+			Elements availableLocation = listing.getElementsByAttributeValue("itemprop", "address");
+			String location = availableLocation.text();
+			
 			
 			// Create scrapedListing
-			scrapedListing = new ProductListing(imageURL, price, title, productURL,
-					ProductListing.BUY_IT_NOW_LISTING, ProductListing.KIJIJI, tags);
+			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
+					ProductListing.KIJIJI, tags);
+			
 
 			// In case of any IO errors, we want the messages written to the console
 		} catch (IOException e) {

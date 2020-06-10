@@ -35,6 +35,13 @@ public class ProductListing {
 	// TODO: Manage currency conversion
 	
 	/**
+	 * Blank constructor
+	 */
+	public ProductListing () {
+		
+	}
+	
+	/**
 	 * Creates a new product listing with the specified parameters
 	 * @param imageURL  the URL of the image
 	 * @param price  the listing price

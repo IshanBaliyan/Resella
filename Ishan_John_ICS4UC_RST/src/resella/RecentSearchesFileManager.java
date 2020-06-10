@@ -6,22 +6,22 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 public class RecentSearchesFileManager {
 	private String filePath;
 	private RecentSearches recentSearches;
 
 	public RecentSearchesFileManager() {
-		this("recentSearches.yaml");
+		this("data//recentSearches.yaml");
 	}
 
 	public RecentSearchesFileManager(String filePath) {
 		this.filePath = filePath;
-		Yaml yaml = new Yaml();
+		Yaml yaml = new Yaml(new Constructor(RecentSearches.class));
 		try {
 			InputStream input = new FileInputStream(new File(filePath));
-			Map<String, Object> map = yaml.load(input);
-			System.out.println(map);
+			RecentSearches recentSearches = yaml.load(input);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

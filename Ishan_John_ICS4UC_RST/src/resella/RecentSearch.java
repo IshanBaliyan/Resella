@@ -6,8 +6,9 @@ import java.util.Locale;
 
 public class RecentSearch {
 	private String keywords;
-	private LocalDateTime searchDateTime;
-	private DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("KK:mm a MM/dd/yyyy", Locale.ENGLISH);
+	private String searchDateTime;
+//	private LocalDateTime searchDateTimeObj;
+//	private DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("KK:mm a MM/dd/yyyy", Locale.ENGLISH);
 
 	public RecentSearch() {
 		// TODO Auto-generated constructor stub
@@ -30,15 +31,16 @@ public class RecentSearch {
 	/**
 	 * @return the searchDateTime
 	 */
-	public LocalDateTime getSearchDateTime() {
+	public String getSearchDateTime() {
 		return searchDateTime;
 	}
 
 	/**
 	 * @param searchDateTimeStr the searchDateTime to set
 	 */
-	public void setSearchDateTime(String searchDateTimeStr) {
-		searchDateTime = LocalDateTime.parse(searchDateTimeStr, dateTimeFormat);
+	public void setSearchDateTime(String searchDateTime) {
+		this.searchDateTime = searchDateTime;
+//		searchDateTimeObj = LocalDateTime.parse(searchDateTimeStr, dateTimeFormat);
 	}
 
 }

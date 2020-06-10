@@ -1,3 +1,7 @@
-firstName: "John"
-lastName: "Doe"
-age: 20
+# Recent Searches Save File
+---
+recentSearches:
+   - keywords: "Hot Wheels"
+     searchDateTime: "12:45 PM 06/10/2020"
+   - keywords: "Kids Help Phone"
+     searchDateTime: "1:45 PM 06/10/2020"

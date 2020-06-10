@@ -223,9 +223,10 @@ public class WebScraper {
 
 			String orderMethod = "PICK UP ONLY";
 			
-			//TODO Add code for webcraping the location - by city or postal code
+			//Scrape the location of the listing
+			Elements availableLocation = listing.getElementsByAttributeValue("itemprop", "address");
+			String location = availableLocation.text();
 			
-			String location = "Ottawa";
 			
 			// Create scrapedListing
 			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,

@@ -77,26 +77,19 @@ public class WebScraper {
 			// Get the list of repositories
 			Elements searchItems = doc.getElementsByClass("s-item__image");
 
-			// Canadian repo code:rsHdr
-
+			// Canadian repo code:rsHdr (not used here but for future reference)
 			for (Element searchItem : searchItems) {
-
 				Elements links = searchItem.select("a[href]");
 				for (Element link : links) {
-
 					String href = link.attr("href");
-
 					if (!href.isEmpty()) {
 
 						// get the value from the href attribute
 						System.out.println("\nlink: " + href);
 						listingSearchResults.add(scrapeListingEBay(href));
-
 					}
 				}
-
 			}
-
 			// In case of any IO errors, we want the messages written to the console
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -113,34 +106,39 @@ public class WebScraper {
 		ProductListing scrapedListing = new ProductListing();
 		ArrayList<String> tags = new ArrayList<String>();
 		try {
+			
 			// Here we create a document object and use JSoup to fetch the website
 			Document doc = Jsoup.connect(productURL).get();
 
+			// Scrape title:
 			Elements titleElement = doc.getElementsByClass("it-ttl");
 			String title = titleElement.text().replaceFirst("Details about ", "");
 
+			// Scrape price:
 			Element priceElement = doc.getElementById("vi-mskumap-none");
 			double price = Double.parseDouble(priceElement.text().replaceFirst("Details about ", ""));
 
+			// Scrape image URL
 			Element imageElement = doc.getElementById("icImg");
-			String imgSource = imageElement.attr("src"); 
+			String imgURL = imageElement.attr("src"); 
 
+			// Scrape shipping price
 			Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
 			Pattern r = Pattern.compile("[0-9]+\\.[0-9]+");
 			Matcher m = r.matcher(shippingPriceElement.text());
 
+			//Reformat shipping price to a double
 			double shippingPrice = 0;
 			if (m.find( )) {
 				shippingPrice = Double.parseDouble(m.group(0).replaceAll(",", ""));
 			}
 			
+			//TODO Scrape the location of the listing
+			String location = "Ottawa";
+			
 			// Create scrapedListing
-			
-			//scrapedListing = new ProductListing(imgSource, price, shippingPrice, title, productURL, ProductListing.BUY_IT_NOW_LISTING, ProductListing.EBAY, tags );
-			
-//			scrapedListing = new ProductListing(imgSource, price, title, productURL, 
-//					ProductListing.BUY_IT_NOW_LISTING, ProductListing.EBAY, tags);
-
+			scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
+					ProductListing.KIJIJI, tags);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -222,9 +220,16 @@ public class WebScraper {
 			Element image = presentation.getElementsByTag("img").first();
 			String imageURL = image.attr("src");
 
+			String orderMethod = "PICK UP ONLY";
+			
+			//TODO Add code for webcraping the location - by city or postal code
+			
+			String location = "Ottawa";
+			
 			// Create scrapedListing
-			scrapedListing = new ProductListing(imageURL, price, title, productURL,
-					ProductListing.BUY_IT_NOW_LISTING, ProductListing.KIJIJI, tags);
+			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
+					ProductListing.KIJIJI, tags);
+			
 
 			// In case of any IO errors, we want the messages written to the console
 		} catch (IOException e) {

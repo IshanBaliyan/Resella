@@ -1,10 +1,14 @@
 package resella;
 
+import java.io.File;
+
 public class RecentSearchesController {
 
+	public RecentSearchesController() {
+		
+	}
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		RecentSearchesFileManager fileManager = new RecentSearchesFileManager();
 	}
 
 }

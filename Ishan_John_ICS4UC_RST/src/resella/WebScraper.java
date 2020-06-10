@@ -118,11 +118,11 @@ public class WebScraper {
 			Element priceElement = doc.getElementById("vi-mskumap-none");
 			double price = Double.parseDouble(priceElement.text().replaceFirst("Details about ", ""));
 
-			// Scrape image URL
+			//Scrape image URL
 			Element imageElement = doc.getElementById("icImg");
 			String imgURL = imageElement.attr("src"); 
 
-			// Scrape shipping price
+			//Scrape shipping price
 			Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
 			Pattern r = Pattern.compile("[0-9]+\\.[0-9]+");
 			Matcher m = r.matcher(shippingPriceElement.text());
@@ -133,8 +133,9 @@ public class WebScraper {
 				shippingPrice = Double.parseDouble(m.group(0).replaceAll(",", ""));
 			}
 			
-			//TODO Scrape the location of the listing
-			String location = "Ottawa";
+			//Scrape the location of the listing
+			Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
+			String location = availableLocation.text();
 			
 			// Create scrapedListing
 			scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
@@ -222,9 +223,10 @@ public class WebScraper {
 
 			String orderMethod = "PICK UP ONLY";
 			
-			//TODO Add code for webcraping the location - by city or postal code
+			//Scrape the location of the listing
+			Elements availableLocation = listing.getElementsByAttributeValue("itemprop", "address");
+			String location = availableLocation.text();
 			
-			String location = "Ottawa";
 			
 			// Create scrapedListing
 			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,

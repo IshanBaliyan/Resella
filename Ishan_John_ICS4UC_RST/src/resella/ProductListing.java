@@ -35,10 +35,19 @@ public class ProductListing {
 	// TODO: Manage currency conversion
 	
 	/**
-	 * Blank constructor
+	 * Blank constructor, populates the fields with the following values
+	 * Default values:
+	 * imageURL: the ebay logo, https://ir.ebaystatic.com/cr/v/c1/ebay-logo-1-1200x630-margin.png
+	 * price: 0.0
+	 * title: the String "UNSET"
+	 * listingURL: eBya's home page, https://www.ebay.com/
+	 * listingType: Buy It Now
+	 * marketplace: EBAY
+	 * tags
+	 * 
 	 */
 	public ProductListing () {
-		
+		this("https://ir.ebaystatic.com/cr/v/c1/ebay-logo-1-1200x630-margin.png", 0.0, "UNSET", "https://www.ebay.com/", BUY_IT_NOW_LISTING, EBAY, new ArrayList<String>());
 	}
 	
 	/**

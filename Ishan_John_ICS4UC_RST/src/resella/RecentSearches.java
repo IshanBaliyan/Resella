@@ -21,4 +21,6 @@ public class RecentSearches {
 	public void setRecentSearches(ArrayList<RecentSearch> recentSearches) {
 		this.recentSearches = recentSearches;
 	}
+	
+	// TODO: Add toString() Override?
 }

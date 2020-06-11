@@ -42,5 +42,7 @@ public class RecentSearch {
 		this.searchDateTime = searchDateTime;
 //		searchDateTimeObj = LocalDateTime.parse(searchDateTimeStr, dateTimeFormat);
 	}
+	
+	//TODO: Add toString() Override?
 
 }

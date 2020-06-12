@@ -22,8 +22,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Hyperlink;
-import resella.ProductListingProperties.ProductLink;
 
 public class ProductListing extends RecursiveTreeObject<ProductListingObservable> {
 	private StringProperty imageURL;

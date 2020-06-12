@@ -180,11 +180,15 @@ public class ResellaTableTest extends Application{
 		screenWidth = primaryScreenBounds.getWidth();
 		screenHeight = primaryScreenBounds.getHeight();
 
+		/********* TABLEFOOTER ********/
+		// Set the tableFooter's formatting options
+		root.getChildren().addAll(filterField, size);
+		
 		/********* ROOT ********/
 		// Set the root's formatting options
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		root.setAlignment(Pos.TOP_CENTER);
-		root.getChildren().addAll(treeView, filterField);
+		root.getChildren().addAll(headerMenu, treeView, tableFooter);
 
 
 		/********* GENERATE SCENE AND ADD IT TO THE STAGE ********/

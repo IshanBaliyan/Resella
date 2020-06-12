@@ -99,7 +99,7 @@ public class Resella extends Application{
                     setText(null);
 
 				}else {
-					Hyperlink hyperlink = item.getHyperlink();
+					Hyperlink hyperlink = new Hyperlink(item.getLinkTitle());
 					hyperlink.setOnAction(event -> getHostServices().showDocument(item.getLinkURL()));
 					setGraphic(hyperlink);
 					setText(null);

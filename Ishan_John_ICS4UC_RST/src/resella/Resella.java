@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -28,6 +29,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import simpleIO.Console;
 
 public class Resella extends Application{
 
@@ -61,16 +63,14 @@ public class Resella extends Application{
 			else return titleColumn.getComputedValue(param);
 		});
 
-		JFXTreeTableColumn<ProductListingProperties, Hyperlink> listingURLColumn = new JFXTreeTableColumn<>("Listing URL");
+		JFXTreeTableColumn<ProductListingProperties, ProductListingProperties.ProductLink> listingURLColumn = new JFXTreeTableColumn<>("Listing URL");
 		listingURLColumn.setPrefWidth(150);
-		listingURLColumn.setCellValueFactory((TreeTableColumn.CellDataFeatures<ProductListingProperties, Hyperlink> param) ->{
-			if(listingURLColumn.validateValue(param)) return param.getValue().getValue().listingURL;
-			else return listingURLColumn.getComputedValue(param);
-		});
-//		
-//		listingURLColumn.setCellValueFactory(new PropertyValueFactory<ProductListingURL, String>)("listingURL");
-//		
-//		listingURLColumn.setCellValueFactory(new TreeItemPropertyValueFactory<ProductListingProperties, Hyperlink>)("listingURL");
+		listingURLColumn.setCellValueFactory((TreeTableColumn.CellDataFeatures<ProductListingProperties, ProductListingProperties.ProductLink> param) ->{
+			return param.getValue().getValue().listingURL; });
+		//		
+		//		listingURLColumn.setCellValueFactory(new PropertyValueFactory<ProductListingURL, String>)("listingURL");
+		//		
+		//		listingURLColumn.setCellValueFactory(new TreeItemPropertyValueFactory<ProductListingProperties, ProductLink>)("listingURL");
 
 		JFXTreeTableColumn<ProductListingProperties, String> priceColumn = new JFXTreeTableColumn<>("Price");
 		priceColumn.setPrefWidth(150);
@@ -89,8 +89,28 @@ public class Resella extends Application{
 
 		});
 
-		listingURLColumn.setCellFactory((TreeTableColumn<ProductListingProperties, Hyperlink> param) -> new GenericEditableTreeTableCell<ProductListingProperties,
-				Hyperlink>(new TextFieldEditorBuilder()));
+		listingURLColumn.setCellFactory(column -> new TreeTableCell<ProductListingProperties, ProductListingProperties.ProductLink>(){
+			@Override
+			protected void updateItem(ProductListingProperties.ProductLink item, boolean empty) {
+
+				super.updateItem(item, empty);
+				if(item == null || empty) {
+					setGraphic(null);
+                    setText(null);
+
+				}else {
+					Hyperlink hyperlink = item.getHyperlink();
+					hyperlink.setOnAction(event -> getHostServices().showDocument(item.getLinkURL()));
+					setGraphic(hyperlink);
+					setText(null);
+				}
+			}
+		});
+
+		//		listingURLColumn.setCellValueFactory(new PropertyValueFactory<ProductListingProperties, ProductLink>("listingURL"));
+
+
+
 
 		titleColumn.setCellFactory((TreeTableColumn<ProductListingProperties, String> param) ->
 		new GenericEditableTreeTableCell<ProductListingProperties, String>(new TextFieldEditorBuilder()));
@@ -105,14 +125,14 @@ public class Resella extends Application{
 
 		ImageView testGalaxy = new ImageView("https://i.ebayimg.com/images/g/7JcAAOSwU9RaeefH/s-l300.jpg");
 
-//		Hyperlink hyperlink = new Hyperlink("google.com");
-//		hyperlink.setOnAction(event -> getHostServices().showDocument("https://www.google.co.in/"));
+		//		ProductLink hyperlink = new ProductLink("google.com");
+		//		hyperlink.setOnAction(event -> getHostServices().showDocument("https://www.google.co.in/"));
 
-//		Hyperlink hyperlink = new Hyperlink("Google");
-//		hyperlink.setOnAction(event -> getHostServices().showDocument("https://www.google.co.in/"));
-		
-		String hyperlink = "google.com";
-		
+		//		ProductLink hyperlink = new ProductLink("Google");
+		//		hyperlink.setOnAction(event -> getHostServices().showDocument("https://www.google.co.in/"));
+
+		String hyperlink = "www.google.com";
+
 		// data
 		ObservableList<ProductListingProperties> productListings = FXCollections.observableArrayList();
 		productListings.add(new ProductListingProperties("Ishan Product", hyperlink,"CD 1"));
@@ -123,18 +143,18 @@ public class Resella extends Application{
 		productListings.add(new ProductListingProperties("HR Department", hyperlink,"HR 1"));
 		productListings.add(new ProductListingProperties("HR Department", hyperlink,"HR 2"));
 		//productListings..add(new TeamsInnerClass(testGalaxy));
-		
-		
-//		for(int i = 0 ; i< 100; i++){
-//			productListings.add(new ProductListingProperties("HR Department", i%10+"","HR 2" + i));
-//		}
-//		for(int i = 0 ; i< 100; i++){
-//			productListings.add(new ProductListingProperties("Computer Department", i%20+"","CD 2" + i));
-//		}
-//
-//		for(int i = 0 ; i< 100; i++){
-//			productListings.add(new ProductListingProperties("IT Department", i%5+"","HR 2" + i));
-//		}
+
+
+		//		for(int i = 0 ; i< 100; i++){
+		//			productListings.add(new ProductListingProperties("HR Department", i%10+"","HR 2" + i));
+		//		}
+		//		for(int i = 0 ; i< 100; i++){
+		//			productListings.add(new ProductListingProperties("Computer Department", i%20+"","CD 2" + i));
+		//		}
+		//
+		//		for(int i = 0 ; i< 100; i++){
+		//			productListings.add(new ProductListingProperties("IT Department", i%5+"","HR 2" + i));
+		//		}
 
 		// build tree
 		final TreeItem<ProductListingProperties> treeItemRoot = new RecursiveTreeItem<ProductListingProperties>(productListings, RecursiveTreeObject::getChildren);
@@ -188,11 +208,5 @@ public class Resella extends Application{
 
 	public static void main(String[] args) {
 		launch(args);
-	}
-	
-	public Hyperlink createHyper(Hyperlink hyperlink) {
-		hyperlink.setOnAction(event -> getHostServices().showDocument("https://www.google.co.in/"));
-		return hyperlink;
-		
 	}
 }

@@ -25,6 +25,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Screen;
@@ -53,45 +54,41 @@ public class Resella extends Application{
 	private HBox headerMenu = new HBox(GAP);
 
 	private HBox tableFooter = new HBox(GAP);
+	
+	private WebScraper scraper;
 
 	@Override
 	public void start(Stage myStage) throws Exception {
-		JFXTreeTableColumn<ProductListingProperties, String> titleColumn = new JFXTreeTableColumn<>("Product Name");
-		titleColumn.setPrefWidth(150);
-		titleColumn.setCellValueFactory((TreeTableColumn.CellDataFeatures<ProductListingProperties, String> param) ->{
-			if(titleColumn.validateValue(param)) return param.getValue().getValue().title;
-			else return titleColumn.getComputedValue(param);
-		});
+		JFXTreeTableColumn<ProductListing, String> imgColumn = new JFXTreeTableColumn<>("Product Image");
+		imgColumn.setPrefWidth(150);
+		imgColumn.setCellValueFactory(param -> param.getValue().getValue().getImgURL());
 
-		JFXTreeTableColumn<ProductListingProperties, ProductListingProperties.ProductLink> listingURLColumn = new JFXTreeTableColumn<>("Listing URL");
+		JFXTreeTableColumn<ProductListing, ProductListing.ProductLink> listingURLColumn = new JFXTreeTableColumn<>("Listing URL");
 		listingURLColumn.setPrefWidth(150);
-		listingURLColumn.setCellValueFactory((TreeTableColumn.CellDataFeatures<ProductListingProperties, ProductListingProperties.ProductLink> param) ->{
-			return param.getValue().getValue().listingURL; });
-		//		
-		//		listingURLColumn.setCellValueFactory(new PropertyValueFactory<ProductListingURL, String>)("listingURL");
-		//		
-		//		listingURLColumn.setCellValueFactory(new TreeItemPropertyValueFactory<ProductListingProperties, ProductLink>)("listingURL");
-
-		JFXTreeTableColumn<ProductListingProperties, String> priceColumn = new JFXTreeTableColumn<>("Price");
-		priceColumn.setPrefWidth(150);
-		priceColumn.setCellValueFactory((TreeTableColumn.CellDataFeatures<ProductListingProperties, String> param) ->{
-			if(priceColumn.validateValue(param)) return param.getValue().getValue().price;
-			else return priceColumn.getComputedValue(param);
-		});
-
-
-		priceColumn.setCellFactory((TreeTableColumn<ProductListingProperties, String> param) -> new GenericEditableTreeTableCell<ProductListingProperties,
-				String>(new TextFieldEditorBuilder()));
-		priceColumn.setOnEditCommit((CellEditEvent<ProductListingProperties, String> t)->{
-			((ProductListingProperties) t.getTreeTableView().getTreeItem(t.getTreeTablePosition().getRow()).getValue()).price
-			.set(t.getNewValue());
-
-
-		});
-
-		listingURLColumn.setCellFactory(column -> new TreeTableCell<ProductListingProperties, ProductListingProperties.ProductLink>(){
+		listingURLColumn.setCellValueFactory(param -> param.getValue().getValue().getListingURL());
+		
+		imgColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>() {
+			private final ImageView imageView;
+			
+			{
+			    imageView = new ImageView();
+			    imageView.setFitWidth(50);
+			    imageView.setFitHeight(50);
+			    setGraphic(imageView);
+			}
+			
 			@Override
-			protected void updateItem(ProductListingProperties.ProductLink item, boolean empty) {
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				if(item !=null) {
+					imageView.setImage(new Image(item));
+				}
+			}
+		});
+
+		listingURLColumn.setCellFactory(column -> new TreeTableCell<ProductListing, ProductListing.ProductLink>(){
+			@Override
+			protected void updateItem(ProductListing.ProductLink item, boolean empty) {
 
 				super.updateItem(item, empty);
 				if(item == null || empty) {
@@ -107,69 +104,27 @@ public class Resella extends Application{
 			}
 		});
 
-		//		listingURLColumn.setCellValueFactory(new PropertyValueFactory<ProductListingProperties, ProductLink>("listingURL"));
-
-
-
-
-		titleColumn.setCellFactory((TreeTableColumn<ProductListingProperties, String> param) ->
-		new GenericEditableTreeTableCell<ProductListingProperties, String>(new TextFieldEditorBuilder()));
-		titleColumn.setOnEditCommit((CellEditEvent<ProductListingProperties, String> t)->{
-			((ProductListingProperties) t.getTreeTableView().getTreeItem(t.getTreeTablePosition().getRow()).getValue()).title.
-			set(t.getNewValue()); 
-		});
-
-		priceColumn.setEditable(false);
+		imgColumn.setEditable(false);
 		listingURLColumn.setEditable(false);
-		titleColumn.setEditable(false);
-
-		ImageView testGalaxy = new ImageView("https://i.ebayimg.com/images/g/7JcAAOSwU9RaeefH/s-l300.jpg");
-
-		//		ProductLink hyperlink = new ProductLink("google.com");
-		//		hyperlink.setOnAction(event -> getHostServices().showDocument("https://www.google.co.in/"));
-
-		//		ProductLink hyperlink = new ProductLink("Google");
-		//		hyperlink.setOnAction(event -> getHostServices().showDocument("https://www.google.co.in/"));
-
-		String hyperlink = "www.google.com";
+		
+		scraper = new WebScraper("hot wheels");
+		scraper.scrapeListings();
 
 		// data
-		ObservableList<ProductListingProperties> productListings = FXCollections.observableArrayList();
-		productListings.add(new ProductListingProperties("Ishan Product", hyperlink,"CD 1"));
-		productListings.add(new ProductListingProperties("Sales Department", hyperlink,"Employee 1"));
-		productListings.add(new ProductListingProperties("Sales Department", hyperlink,"Employee 4"));
-		productListings.add(new ProductListingProperties("Sales Department",hyperlink,"Employee 5"));
-		productListings.add(new ProductListingProperties("IT Department", hyperlink,"ID 2"));
-		productListings.add(new ProductListingProperties("HR Department", hyperlink,"HR 1"));
-		productListings.add(new ProductListingProperties("HR Department", hyperlink,"HR 2"));
-		//productListings..add(new TeamsInnerClass(testGalaxy));
-
-
-		//		for(int i = 0 ; i< 100; i++){
-		//			productListings.add(new ProductListingProperties("HR Department", i%10+"","HR 2" + i));
-		//		}
-		//		for(int i = 0 ; i< 100; i++){
-		//			productListings.add(new ProductListingProperties("Computer Department", i%20+"","CD 2" + i));
-		//		}
-		//
-		//		for(int i = 0 ; i< 100; i++){
-		//			productListings.add(new ProductListingProperties("IT Department", i%5+"","HR 2" + i));
-		//		}
+		ObservableList<ProductListing> productListings = FXCollections.observableArrayList(scraper.getActiveAdListings());
 
 		// build tree
-		final TreeItem<ProductListingProperties> treeItemRoot = new RecursiveTreeItem<ProductListingProperties>(productListings, RecursiveTreeObject::getChildren);
+		final TreeItem<ProductListing> treeItemRoot = new RecursiveTreeItem<ProductListing>(productListings, RecursiveTreeObject::getChildren);
 
-		JFXTreeTableView<ProductListingProperties> treeView = new JFXTreeTableView<ProductListingProperties>(treeItemRoot);
+		JFXTreeTableView<ProductListing> treeView = new JFXTreeTableView<ProductListing>(treeItemRoot);
 
 		treeView.setShowRoot(false);
 		treeView.setEditable(true);
-		treeView.getColumns().setAll(titleColumn, priceColumn, listingURLColumn);
+		treeView.getColumns().setAll(imgColumn, listingURLColumn);
 
 		JFXTextField filterField = new JFXTextField();
 		filterField.textProperty().addListener((o,oldVal,newVal)->{
-			treeView.setPredicate(productListing -> productListing.getValue().price.get().contains(newVal)
-					|| productListing.getValue().title.get().contains(newVal)
-					|| productListing.getValue().listingURL.getBean().toString().contains(newVal));
+			treeView.setPredicate(productListing -> productListing.getValue().getTitle().get().contains(newVal));
 		});
 
 		Label size = new Label();
@@ -181,11 +136,15 @@ public class Resella extends Application{
 		screenWidth = primaryScreenBounds.getWidth();
 		screenHeight = primaryScreenBounds.getHeight();
 
+		/********* TABLEFOOTER ********/
+		// Set the tableFooter's formatting options
+		root.getChildren().addAll(filterField, size);
+		
 		/********* ROOT ********/
 		// Set the root's formatting options
 		root.setPadding(new Insets(GAP, GAP, GAP, GAP));
 		root.setAlignment(Pos.TOP_CENTER);
-		root.getChildren().addAll(treeView, filterField);
+		root.getChildren().addAll(headerMenu, treeView, tableFooter);
 
 
 		/********* GENERATE SCENE AND ADD IT TO THE STAGE ********/

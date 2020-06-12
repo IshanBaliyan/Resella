@@ -17,9 +17,8 @@ public class WebScraper {
 	private String keywords;
 	private String kijijiSearchID = "k0l9004";
 	private String kijijiLocation = "ontario";
-	private ArrayList<ProductListing> activeAdListings;
-
-	private ArrayList<ProductListing> soldAdListings;
+	private ArrayList<ProductListing> activeAdListings = new ArrayList<ProductListing>();
+	private ArrayList<ProductListing> soldAdListings  = new ArrayList<ProductListing>();
 
 	/**
 	 * Constructor for adding keywords
@@ -123,7 +122,8 @@ public class WebScraper {
 
 			// Scrape price:
 			Element priceElement = doc.getElementById("vi-mskumap-none");
-			double price = Double.parseDouble(priceElement.text().replaceFirst("Details about ", ""));
+			double price = 1;
+//			double price = Double.parseDouble(priceElement.text().replaceFirst("Details about ", ""));
 
 			//Scrape image URL
 			Element imageElement = doc.getElementById("icImg");
@@ -149,6 +149,9 @@ public class WebScraper {
 					ProductListing.KIJIJI, tags);
 
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (NullPointerException e) {
 			e.printStackTrace();
 		}
 

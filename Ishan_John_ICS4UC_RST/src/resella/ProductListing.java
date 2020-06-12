@@ -23,7 +23,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class ProductListing extends RecursiveTreeObject<ProductListingObservable> {
+public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	private StringProperty imageURL;
 	private StringProperty title;
 	private ObjectProperty<ProductLink> listingURL;

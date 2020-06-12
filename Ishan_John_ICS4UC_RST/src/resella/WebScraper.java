@@ -18,6 +18,7 @@ public class WebScraper {
 	private String kijijiSearchID = "k0l9004";
 	private String kijijiLocation = "ontario";
 	private ArrayList<ProductListing> activeAdListings;
+
 	private ArrayList<ProductListing> soldAdListings;
 
 	/**
@@ -27,9 +28,15 @@ public class WebScraper {
 	 *                 search the item on the program
 	 */
 	public WebScraper(String keywords) {
-		this.keywords = keywords;
+		setKeyWords(keywords);
 	}
 
+	/**
+	 * Blank Constructor
+	 */
+	public WebScraper() {
+	}
+	
 	/**
 	 * Method that scrapes the listings
 	 */
@@ -239,15 +246,17 @@ public class WebScraper {
 		}
 		return scrapedListing;
 	}
+	
+	public ArrayList<ProductListing> getActiveAdListings() {
+		return activeAdListings;
+	}
 
-	// private ArrayList<ProductListing> getActiveAdListings() {
-	//
-	//
-	// }
+	public ArrayList<ProductListing> getSoldAdListings() {
+		return soldAdListings;
+	}
 
-	// private ArrayList<ProductListing> getSoldAdListings() {
-	//
-	//
-	// }
-
+	public void setKeyWords(String keywords) {
+		this.keywords = keywords;
+	}
+	
 }

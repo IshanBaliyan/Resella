@@ -147,7 +147,7 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	public void setProductLinkTitle(String productLinkTitle) {
 		listingURL.getValue().setLinkTitle(productLinkTitle);
 	}
-
+	
 	/**
 	 * Retrieves the listing's price
 	 * @return price (DoubleProperty) the price of the listing
@@ -163,6 +163,14 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	public void setPrice(double price) {
 		this.price = new SimpleDoubleProperty(price);
 		this.profit = new SimpleDoubleProperty(ProductListing.sellPrice.getValue() - this.price.getValue());
+	}
+	
+	/**
+	 * Retrieves the listing's profit
+	 * @return profit (DoubleProperty) the profit of the listing
+	 */
+	public DoubleProperty getProfit() {
+		return profit;
 	}
 
 	/**
@@ -263,14 +271,14 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	
 	/**
 	 * Retrieves the listing's sell price
-	 * @return price (DoubleProperty) the sell price of the listing
+	 * @return sellPrice (DoubleProperty) the sell price of the listing
 	 */
 	public DoubleProperty getSellPrice() {
 		return sellPrice;
 	}
 	/**
 	 * Sets the listing's sell price, updates the profit
-	 * @param price (double) the new sell price of the listing
+	 * @param sellPrice (double) the new sell price of the listing
 	 */
 	public void setSellPrice(double sellPrice) {
 		ProductListing.sellPrice = new SimpleDoubleProperty(sellPrice);

@@ -28,6 +28,8 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	private StringProperty title;
 	private ObjectProperty<ProductLink> listingURL;
 	private DoubleProperty price;
+	private DoubleProperty profit;
+	private static DoubleProperty sellPrice;
 	private ObservableList<String> tags;
 	private StringProperty listingType;
 	private StringProperty marketplace;
@@ -155,11 +157,12 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	}
 
 	/**
-	 * Sets the listing's price
+	 * Sets the listing's price, updates the profit
 	 * @param price (double) the new price of the listing
 	 */
 	public void setPrice(double price) {
 		this.price = new SimpleDoubleProperty(price);
+		this.profit = new SimpleDoubleProperty(ProductListing.sellPrice.getValue() - this.price.getValue());
 	}
 
 	/**
@@ -258,6 +261,22 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		this.isSold = isSold;
 	}
 	
+	/**
+	 * Retrieves the listing's sell price
+	 * @return price (DoubleProperty) the sell price of the listing
+	 */
+	public DoubleProperty getSellPrice() {
+		return sellPrice;
+	}
+	/**
+	 * Sets the listing's sell price, updates the profit
+	 * @param price (double) the new sell price of the listing
+	 */
+	public void setSellPrice(double sellPrice) {
+		ProductListing.sellPrice = new SimpleDoubleProperty(sellPrice);
+		this.profit = new SimpleDoubleProperty(ProductListing.sellPrice.getValue() - this.price.getValue());
+	}
+
 	/**
 	 * Stores the properties associated with the listing's URL
 	 * Used to set the hyperLink in the JFXTreeTableView

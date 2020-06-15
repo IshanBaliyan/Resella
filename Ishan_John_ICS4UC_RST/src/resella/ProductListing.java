@@ -29,19 +29,19 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	private ObjectProperty<ProductLink> listingURL;
 	private DoubleProperty price;
 	private ObservableList<String> tags;
-	private IntegerProperty listingType;
-	private IntegerProperty marketplace;
+	private StringProperty listingType;
+	private StringProperty marketplace;
 	private boolean isSold;
 	private StringProperty orderMethod;
 	private StringProperty location;
 	
 	// Useful constants
-	public static final int BUY_IT_NOW_LISTING = 0;
-	public static final int AUCTION_LISTING = 1;
-	public static final int EBAY = 0;
-	public static final int KIJIJI = 1;
-	public static final int CRAIGSLIST = 2;
-	public static final int FACEBOOK_MARKETPLACE = 3;
+	public static final String BUY_IT_NOW_LISTING = "Buy It Now";
+	public static final String AUCTION_LISTING = "Auction";
+	public static final String EBAY = "eBay";
+	public static final String KIJIJI = "Kijiji";
+	public static final String CRAIGSLIST = "Craiglist";
+	public static final String FACEBOOK_MARKETPLACE = "Facebook Marketplace";
 	
 	public static final String DEFAULT_IMG = "https://ir.ebaystatic.com/cr/v/c1/ebay-logo-1-1200x630-margin.png";
 	
@@ -56,7 +56,7 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	 * location the String "UNSET"
 	 * title: the String "UNSET"
 	 * listingURL: eBay's home page, https://www.ebay.com/
-	 * listingType: Buy It Now
+	 * listingType: BUY_IT_NOW_LISTING
 	 * marketplace: EBAY
 	 * tags
 	 * 
@@ -73,11 +73,11 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	 * @param location the location of the listing
 	 * @param title  the listing title
 	 * @param listingURL  the listing's URL
-	 * @param listingType  the listing type: 0 for Buy it Now, 1 for auction listings
-	 * @param marketplace  the marketplace where the listing can be found (ex:
+	 * @param listingType  the listing type: (Buy it Now or Auction listings)
+	 * @param marketplace  the marketplace where the listing can be found
 	 * @param tags
 	 */
-	public ProductListing (String imageURL, double price, String orderMethod, String location, String title, String listingURL, int listingType, int marketplace, ArrayList<String> tags) {
+	public ProductListing (String imageURL, double price, String orderMethod, String location, String title, String listingURL, String listingType, String marketplace, ArrayList<String> tags) {
 		// Initialize all the variables
 		this.imageURL = new SimpleStringProperty(imageURL);
 		this.price = new SimpleDoubleProperty(price);
@@ -85,8 +85,8 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		this.location = new SimpleStringProperty(location);
 		this.title = new SimpleStringProperty(title);
 		this.listingURL = new SimpleObjectProperty<ProductLink>(new ProductLink(title, listingURL));
-		this.listingType = new SimpleIntegerProperty(listingType);
-		this.marketplace = new SimpleIntegerProperty(marketplace);;
+		this.listingType = new SimpleStringProperty(listingType);
+		this.marketplace = new SimpleStringProperty(marketplace);;
 		this.tags =  FXCollections.observableArrayList(tags);
 	}
 	
@@ -212,34 +212,34 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 
 	/**
 	 * Retrieves the listing's listingType
-	 * @return listingType  the listing's type (IntegerProperty) (see class constants)
+	 * @return listingType  the listing's type (StringProperty) (see class constants)
 	 */
-	public IntegerProperty getListingType() {
+	public StringProperty getListingType() {
 		return listingType;
 	}
 
 	/**
 	 * Sets the listingType
-	 * @param listingType (int) (see class constants)
+	 * @param listingType (String) (see class constants)
 	 */
-	public void setListingType(int listingType) {
-		this.listingType = new SimpleIntegerProperty(listingType);
+	public void setListingType(String listingType) {
+		this.listingType = new SimpleStringProperty(listingType);
 	}
 
 	/**
 	 * Retrieves the listing's marketplace
-	 * @return marketplace (IntegerProperty) (see class constants)
+	 * @return marketplace (StringProperty) (see class constants)
 	 */
-	public IntegerProperty getMarketplace() {
+	public StringProperty getMarketplace() {
 		return marketplace;
 	}
 
 	/**
 	 * Sets the the listing's marketplace
-	 * @param marketplace  the marketplace to set (int) (see class constants)
+	 * @param marketplace  the marketplace to set (String) (see class constants)
 	 */
-	public void setMarketplace(int marketplace) {
-		this.marketplace = new SimpleIntegerProperty(marketplace);
+	public void setMarketplace(String marketplace) {
+		this.marketplace = new SimpleStringProperty(marketplace);
 	}
 
 	/**

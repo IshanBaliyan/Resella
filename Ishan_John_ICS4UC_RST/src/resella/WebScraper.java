@@ -1,6 +1,7 @@
 package resella;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,24 +45,28 @@ public class WebScraper {
 		try {
 			// item results URL declared and assigned to variable from keywords searched by
 			// the user
-			
+
 			/*
 			Commenting out for going straight to the sold listings
-			
-			String activeEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords + "&_ipg=100" + "&_sop=15";
-			activeAdListings.addAll(scrapeSearchResultsEBay(activeEBayResultsURL));
-			*/
-			String soldEBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords + "&LH_Sold=1"
-					+ "&_ipg=100";
-			soldAdListings.addAll(scrapeSearchResultsEBay(soldEBayResultsURL));
+			 */
+			String eBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords;
+			scrapeSearchResultsEBay(eBayResultsURL, true);
+			scrapeSearchResultsEBay(eBayResultsURL, false);
 
 			String activeKijijiResultsURL = "https://www.kijiji.ca/b-" + kijijiLocation + "/" + keywords + "/"
 					+ kijijiSearchID + "?dc=true" + "&sort=priceAsc";
-			soldAdListings.addAll(scrapeSearchResultsKijiji(activeKijijiResultsURL));
+			scrapeSearchResultsKijiji(activeKijijiResultsURL);
 		}
+
+		//TODO Fix timeout exception
+		//		catch(SocketTimeoutException e) {
+		//			
+		//			
+		//		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+
 
 	}
 
@@ -69,10 +74,23 @@ public class WebScraper {
 	 * This method scrapes search results on EBay
 	 * 
 	 * @param searchURL The search URL for the keywords
-	 * @return ArrayList<ProductListing>
 	 */
-	private ArrayList<ProductListing> scrapeSearchResultsEBay(String searchURL) {
+	private void scrapeSearchResultsEBay(String searchURL, boolean isActiveListings) {
 		ArrayList<ProductListing> listingSearchResults = new ArrayList<ProductListing>();
+
+		//Sets number of listings per page to 100
+		//searchURL += "&_ipg=100";
+
+		//Based on active listings or sold listings,
+		if(isActiveListings) {
+			//Sorts listings from price lowest to highest (find cheapest listings)
+			searchURL += "&_sop=15";
+		}
+		else {
+			//Filters sold listings only
+			searchURL += "&LH_Sold=1";
+		}
+
 		try {
 			// Here we create a document object and use JSoup to fetch the website
 			Document doc = Jsoup.connect(searchURL).get();
@@ -106,7 +124,7 @@ public class WebScraper {
 
 						// get the value from the href attribute
 						System.out.println("\nlink "+ counter + ": " + href);
-						listingSearchResults.add(scrapeListingEBay(href));
+						scrapeListingEBay(href, isActiveListings);
 					}
 				}
 			}
@@ -114,7 +132,6 @@ public class WebScraper {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return listingSearchResults;
 	}
 
 	/**
@@ -122,9 +139,11 @@ public class WebScraper {
 	 * 
 	 * @param productURL The URL for the product listing
 	 */
-	private ProductListing scrapeListingEBay(String productURL) {
+	private boolean scrapeListingEBay(String productURL, boolean isActiveListings) {
 		ProductListing scrapedListing = new ProductListing();
 		ArrayList<String> tags = new ArrayList<String>();
+
+		boolean isSuccessful = true;
 		try {
 
 			// Here we create a document object and use JSoup to fetch the website
@@ -134,79 +153,117 @@ public class WebScraper {
 			Elements titleElement = doc.getElementsByClass("it-ttl");
 			String title = titleElement.text().replaceFirst("Details about ", "");
 
-			Element priceElement;
-			double price;
+			Element priceElement = null;
+			double price = 0;
 
+			if(productURL.equals("https://www.ebay.com/itm/8-Pieces-Dental-Oral-Care-Interdental-Floss-Brush-Tooth-Pick-0-7mm/143626482839?hash=item2170ce3497:g:eGAAAOSwm8VUupGK"))
+			{
+				System.out.println("We have made it");
+			}
 			// Scrape price:
-			priceElement = doc.getElementById("prcIsum");
+			//priceElement = doc.getElementById("prcIsum");
 
-			if (priceElement == null) {
-				priceElement = doc.getElementById("prcIsum_bidPrice");
+			String[] priceIDs = {"prcIsum", "prcIsum_bidPrice", "mm-saleDscPrc"};
 
-				if(priceElement == null) {
-					priceElement = doc.getElementById("mm-saleDscPrc");
+			for (int i = 0; i < priceIDs.length; i++) {
+				priceElement = doc.getElementById(priceIDs[i]);
 
-					if(priceElement == null) {
-						priceElement = doc.getElementsByClass("vi-inl-lnk vi-cvip-prel5").first();
+				if(priceElement != null) {
+					break;
+				}
 
-						//vi-inl-lnk vi-original-listing
-						if(priceElement == null) {
-							priceElement = doc.getElementsByClass("vi-inl-lnk vi-original-listing").first();
+			}
+
+			String[] listingLinkClasses = {"nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5", "vi-inl-lnk vi-original-listing", "ogitm"};
+
+			if(priceElement == null) {
+
+				for (int i = 0; i < listingLinkClasses.length; i++) {
+					Elements linkElements = doc.getElementsByClass(listingLinkClasses[i]);
+
+					for (Element linkElement : linkElements) {
+						if(linkElement != null) {
+							priceElement = linkElement;
+							break;
 						}
 					}
+
 				}
 			}
 
-			try {
-				price = Double.parseDouble(priceElement.attr("content"));
-
-			} catch (NullPointerException | NumberFormatException e) {
-				String originalListingLink = priceElement.select("a").first().attr("href");
-				return scrapeListingEBay(originalListingLink);	
+			if(priceElement == null) {
+				isSuccessful = false;
 			}
+			else {
 
-			//TODO Currency retrieval
+				try {
+					price = Double.parseDouble(priceElement.attr("content"));
 
-			//prcIsum
+				} catch (NullPointerException | NumberFormatException e) {
+					Elements originalListingLink = priceElement.select("a[href]");
 
-			//Scrape image URL
-			Element imageElement = doc.getElementById("icImg");
-			String imgURL = imageElement.attr("src"); 
+					for (Element link : originalListingLink) {
 
-			//Scrape shipping price
-			Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
-			Pattern r = Pattern.compile("[0-9]+\\.[0-9]+");
-			Matcher m = r.matcher(shippingPriceElement.text());
+						String href = link.attr("href");
 
-			//Reformat shipping price to a double
-			double shippingPrice = 0;
-			if (m.find( )) {
-				shippingPrice = Double.parseDouble(m.group(0).replaceAll(",", ""));
+						if (!href.isEmpty()) {
+
+							// get the value from the href attribute
+							return scrapeListingEBay(href, isActiveListings);	
+						}
+					}
+				}
+
+				//TODO Currency retrieval
+
+				//prcIsum
+
+				//Scrape image URL
+				Element imageElement = doc.getElementById("icImg");
+				String imgURL = imageElement.attr("src"); 
+
+				//Scrape shipping price
+				Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
+				Pattern r = Pattern.compile("[0-9]+\\.[0-9]+");
+				Matcher m = r.matcher(shippingPriceElement.text());
+
+				//Reformat shipping price to a double
+				double shippingPrice = 0;
+				if (m.find( )) {
+					shippingPrice = Double.parseDouble(m.group(0).replaceAll(",", ""));
+				}
+
+				//Scrape the location of the listing
+				Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
+				String location = availableLocation.text();
+
+				// Create scrapedListing
+				scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
+						ProductListing.KIJIJI, tags);
+
 			}
-
-			//Scrape the location of the listing
-			Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
-			String location = availableLocation.text();
-
-			// Create scrapedListing
-			scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
-					ProductListing.KIJIJI, tags);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+		if(isSuccessful && isActiveListings) {
+			scrapedListing.setIsSold(false);
+			activeAdListings.add(scrapedListing);
+		}
+		else if(isSuccessful && !isActiveListings){
+			scrapedListing.setIsSold(true);
+			soldAdListings.add(scrapedListing);
+		}
 
-		return scrapedListing;
+		return isSuccessful;
 	}
 
 	/**
 	 * This method scrapes search results from kjiji
 	 * 
 	 * @param searchURL The search URL for the user's keywords
-	 * @return 
 	 */
-	private ArrayList<ProductListing> scrapeSearchResultsKijiji(String searchURL) {
+	private void scrapeSearchResultsKijiji(String searchURL) {
 		ArrayList<ProductListing> listingSearchResults = new ArrayList<ProductListing>();
 		// TODO: check what ?dc=true means
 		// Here we create a document object and use JSoup to fetch the website
@@ -226,6 +283,7 @@ public class WebScraper {
 
 			// Get the list of repositories
 			Elements searchItems = doc.getElementsByClass("regular-ad");
+			int counter = 1;
 
 			for (Element searchItem : searchItems) {
 
@@ -236,8 +294,11 @@ public class WebScraper {
 
 					if (!href.isEmpty()) {
 
+						System.out.println("\nlink "+ counter + ": " + "https://www.kijiji.ca"+  href);
 						// get the value from the href attribute
-						listingSearchResults.add(scrapeListingKijiji("https://www.kijiji.ca" + href));
+
+						scrapeListingKijiji("https://www.kijiji.ca" + href);
+						counter++;
 					}
 				}
 			}
@@ -245,7 +306,6 @@ public class WebScraper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return listingSearchResults;
 	}
 
 	/**
@@ -253,10 +313,12 @@ public class WebScraper {
 	 * 
 	 * @param productURL The URL for the product listing
 	 */
-	private ProductListing scrapeListingKijiji(String productURL) {
+	private boolean scrapeListingKijiji(String productURL) {
 		ProductListing scrapedListing = new ProductListing();
 		ArrayList<String> tags = new ArrayList<String>();
+		boolean isSuccessful = true;
 		try {
+
 			Document listing = Jsoup.connect(productURL).get();
 
 			// Scrape title:
@@ -265,8 +327,18 @@ public class WebScraper {
 
 			// Scrape price:
 			Element priceElement = listing.getElementsByClass("currentPrice-2842943473").first();
-			String priceStr = priceElement.text().replaceAll("[\\$,]", "");
-			double price = Double.parseDouble(priceStr);
+			String priceStr = priceElement.text().replaceAll("[\\$,]", "").replace("Free", "0");
+
+			double price = 0;
+
+			if(priceStr.equals("Please Contact")) {
+
+				//Checking if the web scraper was able to pull successful listings without a "Please Contact" for the price
+				isSuccessful = false;
+			}
+			else {
+				price = Double.parseDouble(priceStr);
+			}
 
 			// Scrape image URL
 			Element presentation = listing.getElementById("mainHeroImage");
@@ -279,17 +351,20 @@ public class WebScraper {
 			Elements availableLocation = listing.getElementsByAttributeValue("itemprop", "address");
 			String location = availableLocation.text();
 
-
 			// Create scrapedListing
 			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
 					ProductListing.KIJIJI, tags);
 
-
 			// In case of any IO errors, we want the messages written to the console
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			e.printStackTrace();
 		}
-		return scrapedListing;
+		if(isSuccessful) {
+			activeAdListings.add(scrapedListing);
+		}
+
+		return isSuccessful;
 	}
 
 	public ArrayList<ProductListing> getActiveAdListings() {
@@ -303,5 +378,4 @@ public class WebScraper {
 	public void setKeyWords(String keywords) {
 		this.keywords = keywords;
 	}
-
 }

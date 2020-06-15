@@ -57,23 +57,37 @@ public class Resella extends Application{
 	
 	private WebScraper scraper;
 
+	private AdListingTable listingTable;
+	
 	@Override
 	public void start(Stage myStage) throws Exception {
+		
+		scraper = new WebScraper("floss");
+		scraper.scrapeListings();
+		
+		listingTable = new AdListingTable(scraper.getSoldAdListings());
+		listingTable.calculateAverageSellPrice();
+		
+		
 		JFXTreeTableColumn<ProductListing, String> imgColumn = new JFXTreeTableColumn<>("Product Image");
 		imgColumn.setPrefWidth(150);
 		imgColumn.setCellValueFactory(param -> param.getValue().getValue().getImgURL());
 
 		JFXTreeTableColumn<ProductListing, ProductListing.ProductLink> listingURLColumn = new JFXTreeTableColumn<>("Listing URL");
-		listingURLColumn.setPrefWidth(150);
+		listingURLColumn.setPrefWidth(200);
 		listingURLColumn.setCellValueFactory(param -> param.getValue().getValue().getListingURL());
+		
+		JFXTreeTableColumn<ProductListing, Double> profitColumn = new JFXTreeTableColumn<>("Potential Profit");
+		profitColumn.setPrefWidth(150);
+		profitColumn.setCellValueFactory(param -> param.getValue().getValue().getProfit().asObject());
 		
 		imgColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>() {
 			private final ImageView imageView;
 			
 			{
 			    imageView = new ImageView();
-			    imageView.setFitWidth(50);
-			    imageView.setFitHeight(50);
+			    imageView.setFitWidth(100);
+			    imageView.setFitHeight(100);
 			    setGraphic(imageView);
 			}
 			
@@ -103,12 +117,24 @@ public class Resella extends Application{
 				}
 			}
 		});
+		
+		profitColumn.setCellFactory(column -> new TreeTableCell<ProductListing, Double>(){
+			@Override
+			protected void updateItem(Double item, boolean empty) {
+
+				super.updateItem(item, empty);
+				if(item == null || empty) {
+                    setText(null);
+
+				}else {
+					setText(item.doubleValue() + "");
+				}
+			}
+		});
 
 		imgColumn.setEditable(false);
 		listingURLColumn.setEditable(false);
-		
-		scraper = new WebScraper("hot wheels");
-		scraper.scrapeListings();
+		profitColumn.setEditable(false);
 
 		// data
 		ObservableList<ProductListing> productListings = FXCollections.observableArrayList(scraper.getActiveAdListings());
@@ -120,11 +146,14 @@ public class Resella extends Application{
 
 		treeView.setShowRoot(false);
 		treeView.setEditable(true);
-		treeView.getColumns().setAll(imgColumn, listingURLColumn);
+		treeView.getColumns().setAll(imgColumn, listingURLColumn, profitColumn);
 
 		JFXTextField filterField = new JFXTextField();
 		filterField.textProperty().addListener((o,oldVal,newVal)->{
-			treeView.setPredicate(productListing -> productListing.getValue().getTitle().get().contains(newVal));
+			treeView.setPredicate(productListing -> productListing.getValue().getTitle().get().toLowerCase().contains(newVal.toLowerCase()));
+			listingTable.filterSoldListings(newVal);
+			listingTable.calculateAverageSellPrice();
+			productListings.get(0).setSellPrice(listingTable.getAverageSellPrice());
 		});
 
 		Label size = new Label();
@@ -138,7 +167,7 @@ public class Resella extends Application{
 
 		/********* TABLEFOOTER ********/
 		// Set the tableFooter's formatting options
-		root.getChildren().addAll(filterField, size);
+		tableFooter.getChildren().addAll(filterField, size);
 		
 		/********* ROOT ********/
 		// Set the root's formatting options

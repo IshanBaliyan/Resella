@@ -56,7 +56,7 @@ public class WebScraper {
 			scrapeSearchResultsEBay(eBayResultsURL, false);
 
 			String activeKijijiResultsURL = "https://www.kijiji.ca/b-" + kijijiLocation + "/" + keywords + "/"
-					+ kijijiSearchID + "?dc=true" + "&sort=priceAsc";
+					+ kijijiSearchID + "?ad=offering" + "?dc=true" + "&sort=priceAsc";
 			scrapeSearchResultsKijiji(activeKijijiResultsURL);
 		}
 
@@ -144,6 +144,7 @@ public class WebScraper {
 	private boolean scrapeListingEBay(String productURL, boolean isActiveListings) {
 		ProductListing scrapedListing = new ProductListing();
 		ArrayList<String> tags = new ArrayList<String>();
+		String listingType = ProductListing.BUY_IT_NOW_LISTING;
 
 		boolean isSuccessful = true;
 		try {
@@ -159,14 +160,15 @@ public class WebScraper {
 			double price = 0;
 
 			// Scrape price:
-			//priceElement = doc.getElementById("prcIsum");
-
 			String[] priceIDs = {"prcIsum", "prcIsum_bidPrice", "mm-saleDscPrc"};
 
 			for (int i = 0; i < priceIDs.length; i++) {
 				priceElement = doc.getElementById(priceIDs[i]);
 
 				if(priceElement != null) {
+					if (priceIDs[i].equals("prcIsum_bidPrice")) {
+						 listingType = ProductListing.AUCTION_LISTING;
+					}
 					break;
 				}
 
@@ -242,8 +244,8 @@ public class WebScraper {
 				String location = availableLocation.text();
 
 				// Create scrapedListing
-				scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
-						ProductListing.KIJIJI, tags);
+				scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, listingType,
+						ProductListing.EBAY, tags);
 
 			}
 		} catch (IOException e) {
@@ -353,9 +355,16 @@ public class WebScraper {
 			}
 
 			// Scrape image URL
-			Element presentation = listing.getElementById("mainHeroImage");
-			Element image = presentation.getElementsByTag("img").first();
-			String imageURL = image.attr("src");
+			String imageURL = "";
+			try {
+				Element presentation = listing.getElementById("mainHeroImage");
+				Element image = presentation.getElementsByTag("img").first();
+				imageURL = image.attr("src");
+			}
+			catch (NullPointerException e) {
+				System.out.println("No image found");
+				isSuccessful = false;
+			}
 
 			String orderMethod = "PICK UP ONLY";
 

@@ -62,7 +62,7 @@ public class Resella extends Application{
 	@Override
 	public void start(Stage myStage) throws Exception {
 		
-		scraper = new WebScraper("camaro zl1");
+		scraper = new WebScraper("iphone x");
 		scraper.scrapeListings();
 		
 		listingTable = new AdListingTable(scraper.getSoldAdListings());
@@ -78,9 +78,21 @@ public class Resella extends Application{
 		listingURLColumn.setPrefWidth(200);
 		listingURLColumn.setCellValueFactory(param -> param.getValue().getValue().getListingURL());
 		
-		JFXTreeTableColumn<ProductListing, Double> profitColumn = new JFXTreeTableColumn<>("Potential Profit");
+		JFXTreeTableColumn<ProductListing, Double> profitColumn = new JFXTreeTableColumn<>("Potential Profit (Shipping Not Included)");
 		profitColumn.setPrefWidth(150);
 		profitColumn.setCellValueFactory(param -> param.getValue().getValue().getProfit().asObject());
+		
+		JFXTreeTableColumn<ProductListing, String> shippingPriceColumn = new JFXTreeTableColumn<>("Shipping Price + Availability");
+		shippingPriceColumn.setPrefWidth(150);
+		shippingPriceColumn.setCellValueFactory(param -> param.getValue().getValue().getOrderMethod());
+		
+		JFXTreeTableColumn<ProductListing, String> listingTypeColumn = new JFXTreeTableColumn<>("Listing Type");
+		listingTypeColumn.setPrefWidth(150);
+		listingTypeColumn.setCellValueFactory(param -> param.getValue().getValue().getListingType());
+		
+		JFXTreeTableColumn<ProductListing, String> marketplaceColumn = new JFXTreeTableColumn<>("Marketplace");
+		marketplaceColumn.setPrefWidth(150);
+		marketplaceColumn.setCellValueFactory(param -> param.getValue().getValue().getMarketplace());
 		
 		imgColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>() {
 			private final ImageView imageView;
@@ -93,7 +105,7 @@ public class Resella extends Application{
 			@Override
 			protected void updateItem(String item, boolean empty) {
 				super.updateItem(item, empty);
-				if(item !=null) {
+				if(item != null) {
 					imageView.setImage(new Image(item, 150, 150, true, true));
 				}
 			}
@@ -130,10 +142,55 @@ public class Resella extends Application{
 				}
 			}
 		});
+		
+		shippingPriceColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>(){
+			@Override
+			protected void updateItem(String item, boolean empty) {
+
+				super.updateItem(item, empty);
+				if(item == null || empty) {
+                    setText(null);
+
+				}else {
+					setText(item);
+				}
+			}
+		});
+
+		listingTypeColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>(){
+			@Override
+			protected void updateItem(String item, boolean empty) {
+
+				super.updateItem(item, empty);
+				if(item == null || empty) {
+                    setText(null);
+
+				}else {
+					setText(item);
+				}
+			}
+		});
+		
+		marketplaceColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>(){
+			@Override
+			protected void updateItem(String item, boolean empty) {
+
+				super.updateItem(item, empty);
+				if(item == null || empty) {
+                    setText(null);
+
+				}else {
+					setText(item);
+				}
+			}
+		});
 
 		imgColumn.setEditable(false);
 		listingURLColumn.setEditable(false);
 		profitColumn.setEditable(false);
+		shippingPriceColumn.setEditable(false);
+		listingTypeColumn.setEditable(false);
+		marketplaceColumn.setEditable(false);
 
 		// data
 		ObservableList<ProductListing> productListings = FXCollections.observableArrayList(scraper.getActiveAdListings());
@@ -145,15 +202,27 @@ public class Resella extends Application{
 
 		treeView.setShowRoot(false);
 		treeView.setEditable(true);
-		treeView.getColumns().setAll(imgColumn, listingURLColumn, profitColumn);
+		treeView.getColumns().setAll(imgColumn, listingURLColumn, profitColumn, shippingPriceColumn, listingTypeColumn, marketplaceColumn);
 
 		JFXTextField filterField = new JFXTextField();
 		filterField.textProperty().addListener((o,oldVal,newVal)->{
-			treeView.setPredicate(productListing -> productListing.getValue().getTitle().get().toLowerCase().contains(newVal.toLowerCase()));
+			treeView.setPredicate(listing -> listing.getValue().getTitle().getValue().toLowerCase().contains(newVal.toLowerCase()) || listing.getValue().getLocation().getValue().toLowerCase().contains(newVal.toLowerCase()) ||
+					listing.getValue().getOrderMethod().getValue().toLowerCase().contains(newVal.toLowerCase()) || listing.getValue().getTags().contains(newVal.toLowerCase()) || 
+					listing.getValue().getMarketplace().getValue().toLowerCase().contains(newVal.toLowerCase()) || listing.getValue().getListingType().getValue().toLowerCase().contains(newVal.toLowerCase()));
 			
-			listingTable.filterSoldListings(newVal);
-			listingTable.calculateAverageSellPrice();
-			ProductListing.setSellPrice(listingTable.getAverageSellPrice());
+			if (newVal.toLowerCase().equals(ProductListing.AUCTION_LISTING.toLowerCase()) || newVal.toLowerCase().equals(ProductListing.BUY_IT_NOW_LISTING.toLowerCase())) {
+				// Don't filter, reset filteredListings
+				listingTable.resetFilteredListings();
+			}
+			else if (newVal.toLowerCase().equals(ProductListing.KIJIJI.toLowerCase())) {
+				// Don't filter, reset filteredListings
+				listingTable.resetFilteredListings();
+			}
+			else {
+				listingTable.filterSoldListings(newVal.toLowerCase());
+				listingTable.calculateAverageSellPrice();
+				ProductListing.setSellPrice(listingTable.getAverageSellPrice());
+			}
 		});
 
 		Label size = new Label();

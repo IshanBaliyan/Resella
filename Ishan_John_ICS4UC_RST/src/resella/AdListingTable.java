@@ -24,7 +24,6 @@ public class AdListingTable {
 		
 		for (int i = 0; i < filteredListings.size(); i++) {
 			average += filteredListings.get(i).getPrice().getValue();	
-			Console.print("Price (adding each to the total): " + filteredListings.get(i).getPrice().getValue());
 			
 		}
 		average /= filteredListings.size();
@@ -33,15 +32,15 @@ public class AdListingTable {
 	
 	public void filterSoldListings(String filterStr){
 		filteredListings = new ArrayList<ProductListing>(soldListings);
-		
 		//Filtering out given String text from all the listings information
-		filteredListings.removeIf(listing -> !listing.getTitle().toString().contains(filterStr));
-		filteredListings.removeIf(listing -> !listing.getLocation().toString().contains(filterStr));
-		filteredListings.removeIf(listing -> !listing.getOrderMethod().toString().contains(filterStr));
-		filteredListings.removeIf(listing -> listing.getTags().contains(filterStr));
-		filteredListings.removeIf(listing -> !listing.getMarketplace().toString().contains(filterStr));
-		filteredListings.removeIf(listing -> !listing.getListingType().toString().contains(filterStr));
-		
+		filteredListings.removeIf(listing -> 
+			!(listing.getTitle().getValue().toLowerCase().contains(filterStr) || listing.getLocation().getValue().toLowerCase().contains(filterStr) ||
+					listing.getOrderMethod().getValue().toLowerCase().contains(filterStr) || listing.getTags().contains(filterStr))
+		);
+	}
+	
+	public void resetFilteredListings() {
+		this.filteredListings = new ArrayList<ProductListing>(soldListings);
 	}
 	
 	public ArrayList<ProductListing> getSoldListings() {
@@ -51,7 +50,7 @@ public class AdListingTable {
 	public void setSoldListings(ArrayList<ProductListing> soldListings) {
 		this.soldListings = new ArrayList<ProductListing>(soldListings);
 	}
-	
+
 	public double getAverageSellPrice() {
 		return averageSellPriceProperty().get();
 	}

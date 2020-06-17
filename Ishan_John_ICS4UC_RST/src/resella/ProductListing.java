@@ -94,7 +94,7 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		this.title = new SimpleStringProperty(title);
 		this.listingURL = new SimpleObjectProperty<ProductLink>(new ProductLink(title, listingURL));
 		this.listingType = new SimpleStringProperty(listingType);
-		this.marketplace = new SimpleStringProperty(marketplace);;
+		this.marketplace = new SimpleStringProperty(marketplace);
 		this.tags =  FXCollections.observableArrayList(tags);
 		
 		setSellPrice(newPrice);
@@ -103,13 +103,6 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		});
 		
 		profit = new SimpleDoubleProperty(sellPrice.getValue() - price.getValue());
-		
-//		sellPrice.addListener(new ChangeListener<Number>() {
-//			@Override
-//			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//	        		profit = new SimpleDoubleProperty(newValue.doubleValue() - price.getValue());
-//	        }
-//	    });
 	}
 	
 	/**

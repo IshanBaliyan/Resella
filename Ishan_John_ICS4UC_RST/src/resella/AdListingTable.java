@@ -24,6 +24,8 @@ public class AdListingTable {
 		
 		for (int i = 0; i < filteredListings.size(); i++) {
 			average += filteredListings.get(i).getPrice().getValue();	
+			Console.print("Price (adding each to the total): " + filteredListings.get(i).getPrice().getValue());
+			
 		}
 		average /= filteredListings.size();
 		setAverageSellPrice(Double.parseDouble(Console.roundDouble(average, 2)));

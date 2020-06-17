@@ -11,6 +11,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import simpleIO.Console;
+
 public class WebScraper {
 
 	// Declaring variables for use in class
@@ -124,6 +126,7 @@ public class WebScraper {
 					// get the value from the href attribute
 					System.out.println("\nlink "+ counter + ": " + href);
 					scrapeListingEBay(href, isActiveListings);
+
 				}
 
 			}
@@ -155,10 +158,6 @@ public class WebScraper {
 			Element priceElement = null;
 			double price = 0;
 
-			if(productURL.equals("https://www.ebay.com/itm/8-Pieces-Dental-Oral-Care-Interdental-Floss-Brush-Tooth-Pick-0-7mm/143626482839?hash=item2170ce3497:g:eGAAAOSwm8VUupGK"))
-			{
-				System.out.println("We have made it");
-			}
 			// Scrape price:
 			//priceElement = doc.getElementById("prcIsum");
 
@@ -173,7 +172,7 @@ public class WebScraper {
 
 			}
 
-			String[] listingLinkClasses = {"nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5", "vi-inl-lnk vi-original-listing", "ogitm"};
+			String[] listingLinkClasses = {"nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5", "vi-inl-lnk vi-original-listing", "ogitm", "u-flL w29 vi-price"};
 
 			if(priceElement == null) {
 
@@ -196,11 +195,15 @@ public class WebScraper {
 			else {
 
 				try {
-					price = Double.parseDouble(priceElement.attr("content"));
+					if(priceElement.hasAttr("content")) {
+						price = Double.parseDouble(priceElement.attr("content"));
+					}
+					else{
+						price = Double.parseDouble(priceElement.text().replaceAll("[A-Z]+|[\\$ ,]", ""));
+					}
 
 				} catch (NullPointerException | NumberFormatException e) {
 					Elements originalListingLink = priceElement.select("a[href]");
-
 
 					for (Element link : originalListingLink) {
 
@@ -212,6 +215,7 @@ public class WebScraper {
 							return scrapeListingEBay(href, isActiveListings);	
 						}
 					}
+
 				}
 
 				//TODO Currency retrieval

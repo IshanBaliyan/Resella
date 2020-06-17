@@ -117,16 +117,15 @@ public class WebScraper {
 			for (Element searchItem : searchItems) {
 
 				counter++;
-				Elements links = searchItem.select("a[href]");
-				for (Element link : links) {
-					String href = link.attr("href");
-					if (!href.isEmpty()) {
+				Element link = searchItem.select("a[href]").first();
+				String href = link.attr("href");
+				if (!href.isEmpty()) {
 
-						// get the value from the href attribute
-						System.out.println("\nlink "+ counter + ": " + href);
-						scrapeListingEBay(href, isActiveListings);
-					}
+					// get the value from the href attribute
+					System.out.println("\nlink "+ counter + ": " + href);
+					scrapeListingEBay(href, isActiveListings);
 				}
+
 			}
 			// In case of any IO errors, we want the messages written to the console
 		} catch (IOException e) {
@@ -201,6 +200,7 @@ public class WebScraper {
 
 				} catch (NullPointerException | NumberFormatException e) {
 					Elements originalListingLink = priceElement.select("a[href]");
+
 
 					for (Element link : originalListingLink) {
 
@@ -287,21 +287,25 @@ public class WebScraper {
 
 			for (Element searchItem : searchItems) {
 
-				Elements links = searchItem.select("a[href]");
-				for (Element link : links) {
+				Element link = searchItem.select("a[href]").first();
+				String href = link.attr("href");
 
-					String href = link.attr("href");
+				if (!href.isEmpty()) {
 
-					if (!href.isEmpty()) {
-
-						System.out.println("\nlink "+ counter + ": " + "https://www.kijiji.ca"+  href);
-						// get the value from the href attribute
-
-						scrapeListingKijiji("https://www.kijiji.ca" + href);
-						counter++;
+					if(href.contains("https:")) {
+						System.out.println("\nlink "+ counter + ": " +  href);
+						System.out.println("Cannot access links that are not from https://www.kijiji.ca");
 					}
+					else {
+						System.out.println("\nlink "+ counter + ": " + "https://www.kijiji.ca"+  href);
+
+						// get the value from the href attribute
+						scrapeListingKijiji("https://www.kijiji.ca" + href);
+					}
+					counter++;
 				}
 			}
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -331,12 +335,16 @@ public class WebScraper {
 
 			double price = 0;
 
-			if(priceStr.equals("Please Contact")) {
+			Pattern r = Pattern.compile("[0-9]+\\.[0-9]{2}");
+			Matcher m = r.matcher(priceStr);
+
+			if(priceStr.equals("Please Contact") || !m.find()) {
 
 				//Checking if the web scraper was able to pull successful listings without a "Please Contact" for the price
 				isSuccessful = false;
 			}
 			else {
+				priceStr = m.group();
 				price = Double.parseDouble(priceStr);
 			}
 

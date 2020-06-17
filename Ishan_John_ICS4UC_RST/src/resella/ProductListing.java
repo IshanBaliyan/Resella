@@ -20,9 +20,15 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ * @author ishan
+ *
+ */
 public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	private StringProperty imageURL;
 	private StringProperty title;
@@ -79,10 +85,10 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	 * @param marketplace  the marketplace where the listing can be found
 	 * @param tags
 	 */
-	public ProductListing (String imageURL, double price, String orderMethod, String location, String title, String listingURL, String listingType, String marketplace, ArrayList<String> tags) {
+	public ProductListing (String imageURL, double newPrice, String orderMethod, String location, String title, String listingURL, String listingType, String marketplace, ArrayList<String> tags) {
 		// Initialize all the variables
 		this.imageURL = new SimpleStringProperty(imageURL);
-		this.price = new SimpleDoubleProperty(price);
+		this.price = new SimpleDoubleProperty(newPrice);
 		this.orderMethod = new SimpleStringProperty(orderMethod);
 		this.location = new SimpleStringProperty(location);
 		this.title = new SimpleStringProperty(title);
@@ -90,6 +96,20 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		this.listingType = new SimpleStringProperty(listingType);
 		this.marketplace = new SimpleStringProperty(marketplace);;
 		this.tags =  FXCollections.observableArrayList(tags);
+		
+		setSellPrice(newPrice);
+		sellPrice.addListener((observable, oldValue, newValue) -> {
+			profit = new SimpleDoubleProperty(newValue.doubleValue() - price.getValue());
+		});
+		
+		profit = new SimpleDoubleProperty(sellPrice.getValue() - price.getValue());
+		
+//		sellPrice.addListener(new ChangeListener<Number>() {
+//			@Override
+//			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//	        		profit = new SimpleDoubleProperty(newValue.doubleValue() - price.getValue());
+//	        }
+//	    });
 	}
 	
 	/**
@@ -271,20 +291,34 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	
 	/**
 	 * Retrieves the listing's sell price
-	 * @return sellPrice (DoubleProperty) the sell price of the listing
+	 * @return sellPrice (double) the sell price of the listing
 	 */
-	public DoubleProperty getSellPrice() {
-		return sellPrice;
+	public static double getSellPrice() {
+		return sellPriceProperty().get();
 	}
+	
 	/**
 	 * Sets the listing's sell price, updates the profit
 	 * @param sellPrice (double) the new sell price of the listing
 	 */
-	public void setSellPrice(double sellPrice) {
-		ProductListing.sellPrice = new SimpleDoubleProperty(sellPrice);
-		this.profit = new SimpleDoubleProperty(ProductListing.sellPrice.getValue() - this.price.getValue());
+	public static void setSellPrice(double sellPrice) {
+		sellPriceProperty().set(sellPrice);
 	}
-
+	
+	
+	/**
+	 * Method that check if the sell price is empty (null), then assigns a value as necessary
+	 * 
+	 * @return sellPrice (DoubleProperty) the sell price of the listing
+	 */
+	public static DoubleProperty sellPriceProperty() {
+		if(sellPrice == null) {
+			sellPrice = new SimpleDoubleProperty(0);
+		}
+		
+		return sellPrice;
+	}
+	
 	/**
 	 * Stores the properties associated with the listing's URL
 	 * Used to set the hyperLink in the JFXTreeTableView

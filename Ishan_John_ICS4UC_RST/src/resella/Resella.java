@@ -62,12 +62,13 @@ public class Resella extends Application{
 	@Override
 	public void start(Stage myStage) throws Exception {
 		
-		scraper = new WebScraper("floss");
+		scraper = new WebScraper("camaro zl1");
 		scraper.scrapeListings();
 		
 		listingTable = new AdListingTable(scraper.getSoldAdListings());
 		listingTable.calculateAverageSellPrice();
 		
+		ProductListing.setSellPrice(listingTable.getAverageSellPrice());
 		
 		JFXTreeTableColumn<ProductListing, String> imgColumn = new JFXTreeTableColumn<>("Product Image");
 		imgColumn.setPrefWidth(150);
@@ -86,8 +87,6 @@ public class Resella extends Application{
 			
 			{
 			    imageView = new ImageView();
-			    imageView.setFitWidth(100);
-			    imageView.setFitHeight(100);
 			    setGraphic(imageView);
 			}
 			
@@ -95,7 +94,7 @@ public class Resella extends Application{
 			protected void updateItem(String item, boolean empty) {
 				super.updateItem(item, empty);
 				if(item !=null) {
-					imageView.setImage(new Image(item));
+					imageView.setImage(new Image(item, 150, 150, true, true));
 				}
 			}
 		});
@@ -151,14 +150,18 @@ public class Resella extends Application{
 		JFXTextField filterField = new JFXTextField();
 		filterField.textProperty().addListener((o,oldVal,newVal)->{
 			treeView.setPredicate(productListing -> productListing.getValue().getTitle().get().toLowerCase().contains(newVal.toLowerCase()));
+			
 			listingTable.filterSoldListings(newVal);
 			listingTable.calculateAverageSellPrice();
-			productListings.get(0).setSellPrice(listingTable.getAverageSellPrice());
+			ProductListing.setSellPrice(listingTable.getAverageSellPrice());
 		});
 
 		Label size = new Label();
 		size.textProperty().bind(Bindings.createStringBinding(()->treeView.getCurrentItemsCount()+"",
 				treeView.currentItemsCountProperty()));
+		
+		Label sellPrice = new Label();
+		sellPrice.textProperty().bind(Bindings.createStringBinding(()-> listingTable.getAverageSellPrice() + "", listingTable.averageSellPriceProperty()));
 
 		// Get screen dimensions
 		Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -167,7 +170,7 @@ public class Resella extends Application{
 
 		/********* TABLEFOOTER ********/
 		// Set the tableFooter's formatting options
-		tableFooter.getChildren().addAll(filterField, size);
+		tableFooter.getChildren().addAll(filterField, size, sellPrice);
 		
 		/********* ROOT ********/
 		// Set the root's formatting options

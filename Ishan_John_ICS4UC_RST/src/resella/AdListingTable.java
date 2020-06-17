@@ -2,14 +2,19 @@ package resella;
 
 import java.util.ArrayList;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import simpleIO.Console;
 
 public class AdListingTable {
 
-	private ArrayList<ProductListing> soldListings = new ArrayList<ProductListing>();
-	private double averageSellPrice = 0;
-
+	private ArrayList<ProductListing> soldListings;
+	private ArrayList<ProductListing> filteredListings;
+	private DoubleProperty averageSellPrice;
+	
 	public AdListingTable(ArrayList<ProductListing> soldListings) {
+		
+		filteredListings = new ArrayList<ProductListing>(soldListings);
 		this.soldListings = soldListings;
 	}
 	
@@ -17,22 +22,23 @@ public class AdListingTable {
 		
 		double average = 0;
 		
-		for (int i = 0; i < soldListings.size(); i++) {
-			average += soldListings.get(i).getPrice().getValue();	
+		for (int i = 0; i < filteredListings.size(); i++) {
+			average += filteredListings.get(i).getPrice().getValue();	
 		}
-		average /= soldListings.size();
-		averageSellPrice = Double.parseDouble(Console.roundDouble(average, 2));
+		average /= filteredListings.size();
+		setAverageSellPrice(Double.parseDouble(Console.roundDouble(average, 2)));
 	}
 	
 	public void filterSoldListings(String filterStr){
+		filteredListings = new ArrayList<ProductListing>(soldListings);
 		
 		//Filtering out given String text from all the listings information
-		soldListings.removeIf(listing -> !listing.getTitle().toString().contains(filterStr));
-		soldListings.removeIf(listing -> !listing.getLocation().toString().contains(filterStr));
-		soldListings.removeIf(listing -> !listing.getOrderMethod().toString().contains(filterStr));
-		soldListings.removeIf(listing -> listing.getTags().contains(filterStr));
-		soldListings.removeIf(listing -> !listing.getMarketplace().toString().contains(filterStr));
-		soldListings.removeIf(listing -> !listing.getListingType().toString().contains(filterStr));
+		filteredListings.removeIf(listing -> !listing.getTitle().toString().contains(filterStr));
+		filteredListings.removeIf(listing -> !listing.getLocation().toString().contains(filterStr));
+		filteredListings.removeIf(listing -> !listing.getOrderMethod().toString().contains(filterStr));
+		filteredListings.removeIf(listing -> listing.getTags().contains(filterStr));
+		filteredListings.removeIf(listing -> !listing.getMarketplace().toString().contains(filterStr));
+		filteredListings.removeIf(listing -> !listing.getListingType().toString().contains(filterStr));
 		
 	}
 	
@@ -41,17 +47,23 @@ public class AdListingTable {
 	}
 
 	public void setSoldListings(ArrayList<ProductListing> soldListings) {
-		this.soldListings = soldListings;
+		this.soldListings = new ArrayList<ProductListing>(soldListings);
 	}
 	
 	public double getAverageSellPrice() {
-		return averageSellPrice;
+		return averageSellPriceProperty().get();
 	}
 
 	public void setAverageSellPrice(double averageSellPrice) {
-		this.averageSellPrice = averageSellPrice;
+		averageSellPriceProperty().set(averageSellPrice);
 	}
 	
+	public DoubleProperty averageSellPriceProperty() {
+		if(averageSellPrice == null) {
+			averageSellPrice = new SimpleDoubleProperty(0.0);
+		}
+		return averageSellPrice;
+	}
 
 }
 

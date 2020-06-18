@@ -1,11 +1,11 @@
 package resella;
 
 /**
- * @author John Wolf
+ * @author Ishan Baliyan and John Wolf
  * Date June 2020
  * Course: ICS4U
  * ProductListing.java
- * Responsible representing each product listing and its accompanying data
+ * Responsible for representing each product listing and its accompanying data
  */
 
 import java.util.ArrayList;
@@ -21,11 +21,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * @author ishan
- *
- */
 public class ProductListing extends RecursiveTreeObject<ProductListing> {
+	
+	//Variables for the characteristics of the product listings
 	private StringProperty imageURL;
 	private StringProperty title;
 	private ObjectProperty<ProductLink> listingURL;

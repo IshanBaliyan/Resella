@@ -1,5 +1,12 @@
 package resella;
 
+/**
+ * @author Ishan Baliyan and John Wolf
+ * Date June 2020
+ * Course: ICS4U
+ * Program that scrapes online for product listings in marketplaces and finds potential profit in undervalued listings
+ */
+
 import com.jfoenix.controls.*;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 
@@ -48,6 +55,8 @@ public class Resella extends Application{
 	
 	private String searchKeywords = "";
 	
+	private ImageView logoImage;
+	
 	private ObservableList<ProductListing> productListings;
 	
 	private JFXTreeTableColumn<ProductListing, String> imgColumn;
@@ -64,16 +73,21 @@ public class Resella extends Application{
 	@Override
 	public void start(Stage myStage) throws Exception {
 		
-		
+		//Prompting user for the keywords to search for
 		searchKeywords = Console.readString("Please enter keywords to use:");
 		
 		searchField.setPromptText("Search...");
 		searchField.setText(searchKeywords);
 		searchField.setOnAction(event -> searchForDeals(searchField.getText()));
 		
+		//Declaring a webscraper to scrape information
 		scraper = new WebScraper();
+		
+		//Declaring a sold listing manager to calculate the average price and use for profit
 		soldListingsMgr = new SoldListingsManager();
 		
+		
+		//Creating columns for information about each listing
 		imgColumn = new JFXTreeTableColumn<>("Product Image");
 		imgColumn.setPrefWidth(150);
 		imgColumn.setCellValueFactory(param -> param.getValue().getValue().getImgURL());
@@ -207,6 +221,7 @@ public class Resella extends Application{
 			}
 		});
 
+		//Making all the information in all the columns non-editable so they are definite and user can't change
 		imgColumn.setEditable(false);
 		listingURLColumn.setEditable(false);
 		profitColumn.setEditable(false);
@@ -215,6 +230,7 @@ public class Resella extends Application{
 		marketplaceColumn.setEditable(false);
 		locationColumn.setEditable(false);
 		
+		//Searching for deals with the keywords
 		searchForDeals(searchKeywords);
 
 		JFXTextField filterField = new JFXTextField();
@@ -239,10 +255,12 @@ public class Resella extends Application{
 			}
 		});
 
+		//Displaying the relevant results either filtered or non-filtered
 		Label size = new Label();
 		size.textProperty().bind(Bindings.createStringBinding(()-> "Relevant Results: " + treeView.getCurrentItemsCount(),
 				treeView.currentItemsCountProperty()));
 		
+		//Displaying the sell price
 		Label sellPrice = new Label();
 		sellPrice.textProperty().bind(Bindings.createStringBinding(()->  "Average Sell Price: " + soldListingsMgr.getAverageSellPrice(), soldListingsMgr.averageSellPriceProperty()));
 
@@ -277,6 +295,10 @@ public class Resella extends Application{
 		scene.getStylesheets().add("/CSS/Resella.css");
 
 
+		/* Just in case its not completely clear, the name Resella is similar to the word Reseller
+		 * since the demographic is for resellers
+		*/
+		
 		myStage.setTitle("Resella");
 		myStage.setScene(scene);
 		myStage.setMaximized(true);
@@ -289,11 +311,13 @@ public class Resella extends Application{
 	 * 
 	 * @param keywords The keywords to search for
 	 */
+	@SuppressWarnings("unchecked")
 	private void searchForDeals(String keywords) {
 		searchKeywords = keywords;
 		scraper.setKeyWords(searchKeywords);
 		scraper.scrapeListings();
 		
+		//Calculating the average sell price for the listings solds with the keywords
 		soldListingsMgr.setSoldListings(scraper.getSoldAdListings());
 		soldListingsMgr.resetFilteredListings();
 		soldListingsMgr.calculateAverageSellPrice();

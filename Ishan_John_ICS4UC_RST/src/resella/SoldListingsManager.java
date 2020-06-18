@@ -1,5 +1,11 @@
 package resella;
-
+/**
+ * @author Ishan Baliyan and John Wolf
+ * Date June 2020
+ * Course: ICS4U
+ * SoldListingsManager.java
+ * Responsible for managing sold listings for aiding in tasks such as finding average sell price and filtering listings
+ */
 import java.util.ArrayList;
 
 import javafx.beans.property.DoubleProperty;

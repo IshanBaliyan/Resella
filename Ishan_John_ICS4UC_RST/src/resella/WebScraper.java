@@ -56,7 +56,7 @@ public class WebScraper {
 			scrapeSearchResultsEBay(eBayResultsURL, false);
 
 			String activeKijijiResultsURL = "https://www.kijiji.ca/b-" + kijijiLocation + "/" + keywords + "/"
-					+ kijijiSearchID + "?ad=offering" + "?dc=true" + "&sort=priceAsc";
+					+ kijijiSearchID + "?ad=offering" + "?dc=true";// + "&sort=priceAsc";
 			scrapeSearchResultsKijiji(activeKijijiResultsURL);
 		}
 
@@ -80,16 +80,16 @@ public class WebScraper {
 	private void scrapeSearchResultsEBay(String searchURL, boolean isActiveListings) {
 		ArrayList<ProductListing> listingSearchResults = new ArrayList<ProductListing>();
 
-		//Sets number of listings per page to 100
-		//searchURL += "&_ipg=100";
+		// Sets number of listings per page to 100
+		searchURL += "&_ipg=100";
 
-		//Based on active listings or sold listings,
+		// Based on active listings or sold listings,
 		if(isActiveListings) {
-			//Sorts listings from price lowest to highest (find cheapest listings)
-			searchURL += "&_sop=15";
+			// Sorts listings from price lowest to highest (find cheapest listings)
+			// searchURL += "&_sop=15";
 		}
 		else {
-			//Filters sold listings only
+			// Filters sold listings only
 			searchURL += "&LH_Sold=1";
 		}
 
@@ -244,7 +244,7 @@ public class WebScraper {
 				String location = availableLocation.text();
 
 				// Create scrapedListing
-				scrapedListing = new ProductListing(imgURL, price, "Shipping: "+ shippingPrice, location, title, productURL, listingType,
+				scrapedListing = new ProductListing(imgURL, price, "" + shippingPrice, location, title, productURL, listingType,
 						ProductListing.EBAY, tags);
 
 			}

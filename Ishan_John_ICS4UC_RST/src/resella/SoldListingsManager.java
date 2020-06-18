@@ -6,13 +6,19 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import simpleIO.Console;
 
-public class AdListingTable {
+public class SoldListingsManager {
 
 	private ArrayList<ProductListing> soldListings;
 	private ArrayList<ProductListing> filteredListings;
 	private DoubleProperty averageSellPrice;
 	
-	public AdListingTable(ArrayList<ProductListing> soldListings) {
+	public SoldListingsManager() {
+		
+		filteredListings = new ArrayList<ProductListing>();
+		this.soldListings = new ArrayList<ProductListing>();
+	}
+	
+	public SoldListingsManager(ArrayList<ProductListing> soldListings) {
 		
 		filteredListings = new ArrayList<ProductListing>(soldListings);
 		this.soldListings = soldListings;
@@ -35,7 +41,8 @@ public class AdListingTable {
 		//Filtering out given String text from all the listings information
 		filteredListings.removeIf(listing -> 
 			!(listing.getTitle().getValue().toLowerCase().contains(filterStr) || listing.getLocation().getValue().toLowerCase().contains(filterStr) ||
-					listing.getOrderMethod().getValue().toLowerCase().contains(filterStr) || listing.getTags().contains(filterStr))
+					listing.getOrderMethod().getValue().toLowerCase().contains(filterStr) || listing.getTags().contains(filterStr) || 
+					listing.getLocation().getValue().toLowerCase().contains(filterStr))
 		);
 	}
 	

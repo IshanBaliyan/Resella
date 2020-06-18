@@ -2,6 +2,7 @@ package resella;
 
 import java.util.ArrayList;
 
+//Class not implemented in program yet
 public class RecentSearches {
 	private ArrayList<RecentSearch> recentSearches = new ArrayList<RecentSearch>();
 

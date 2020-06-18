@@ -12,18 +12,30 @@ public class SoldListingsManager {
 	private ArrayList<ProductListing> filteredListings;
 	private DoubleProperty averageSellPrice;
 	
+	/**
+	 * Blank Constructor
+	 */
 	public SoldListingsManager() {
 		
 		filteredListings = new ArrayList<ProductListing>();
 		this.soldListings = new ArrayList<ProductListing>();
 	}
 	
+	
+	/**
+	 * Constructor for filtering sold listings
+	 * 
+	 * @param soldListings ArrayList with the sold listings
+	 */
 	public SoldListingsManager(ArrayList<ProductListing> soldListings) {
 		
 		filteredListings = new ArrayList<ProductListing>(soldListings);
 		this.soldListings = soldListings;
 	}
 	
+	/**
+	 * Calculate the average price of the sold listings (including filtered keywords)
+	 */
 	public void calculateAverageSellPrice() {
 		
 		double average = 0;
@@ -36,6 +48,11 @@ public class SoldListingsManager {
 		setAverageSellPrice(Double.parseDouble(Console.roundDouble(average, 2)));
 	}
 	
+	/**
+	 * Filter the sold listings with what information the user wants to filter
+	 * 
+	 * @param filterStr The information the user wants to filter
+	 */
 	public void filterSoldListings(String filterStr){
 		filteredListings = new ArrayList<ProductListing>(soldListings);
 		//Filtering out given String text from all the listings information
@@ -46,26 +63,54 @@ public class SoldListingsManager {
 		);
 	}
 	
+	/**
+	 * Reset the filtered listings to their old version with old listings
+	 */
 	public void resetFilteredListings() {
 		this.filteredListings = new ArrayList<ProductListing>(soldListings);
 	}
 	
+	/**
+	 * Get the sold listings
+	 * 
+	 * @return ArrayList<ProductListing> of the sold listings
+	 */
 	public ArrayList<ProductListing> getSoldListings() {
 		return soldListings;
 	}
 
+	/**
+	 * Set the sold listings
+	 * 
+	 * @param soldListings (ArrayList<ProductListing>) The soldListings to set to
+	 */
 	public void setSoldListings(ArrayList<ProductListing> soldListings) {
 		this.soldListings = new ArrayList<ProductListing>(soldListings);
 	}
 
+	/**
+	 * Get the average sell price of the sold listings (provides sold filters listings as needed)
+	 * 
+	 * @return
+	 */
 	public double getAverageSellPrice() {
 		return averageSellPriceProperty().get();
 	}
 
+	/**
+	 * Set average sell price of the listing
+	 * 
+	 * @param averageSellPrice (double) The average sell price of the listing
+	 */
 	public void setAverageSellPrice(double averageSellPrice) {
 		averageSellPriceProperty().set(averageSellPrice);
 	}
 	
+	/**
+	 * Use average sell price property
+	 * 
+	 * @return (DoubleProperty) The average sell price
+	 */
 	public DoubleProperty averageSellPriceProperty() {
 		if(averageSellPrice == null) {
 			averageSellPrice = new SimpleDoubleProperty(0.0);

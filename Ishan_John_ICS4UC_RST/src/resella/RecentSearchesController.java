@@ -5,6 +5,9 @@ import java.io.File;
 //Class not implemented in program yet
 public class RecentSearchesController {
 
+	/**
+	 * Main constructor
+	 */
 	public RecentSearchesController() {
 		
 	}

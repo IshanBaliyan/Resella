@@ -1,5 +1,11 @@
 package resella;
-
+/**
+ * @author Ishan Baliyan and John Wolf
+ * Date June 2020
+ * Course: ICS4U
+ * WebScraper.java
+ * Scrapes the web for product listings in different marketplaces
+ */
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -11,7 +17,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import simpleIO.Console;
 
 public class WebScraper {
 
@@ -339,11 +344,14 @@ public class WebScraper {
 			Element priceElement = listing.getElementsByClass("currentPrice-2842943473").first();
 			String priceStr = priceElement.text().replaceAll("[\\$,]", "").replace("Free", "0");
 
+			//Price of the product
 			double price = 0;
-
+			
+			//Using regix to filter out unwanted information from the variable
 			Pattern r = Pattern.compile("[0-9]+\\.[0-9]{2}");
 			Matcher m = r.matcher(priceStr);
 
+			//If there is no price, just skip the listing (please contact means you have to contact for the price)
 			if(priceStr.equals("Please Contact") || !m.find()) {
 
 				//Checking if the web scraper was able to pull successful listings without a "Please Contact" for the price
@@ -366,6 +374,7 @@ public class WebScraper {
 				isSuccessful = false;
 			}
 
+			//Can't ship orders for kijii
 			String orderMethod = "PICK UP ONLY";
 
 			//Scrape the location of the listing
@@ -388,14 +397,29 @@ public class WebScraper {
 		return isSuccessful;
 	}
 
+	/**
+	 * Get the active listings
+	 * 
+	 * @return (ArrayList<ProductListing>) The active listings
+	 */
 	public ArrayList<ProductListing> getActiveAdListings() {
 		return activeAdListings;
 	}
 
+	/**
+	 * Get the sold listings
+	 * 
+	 * @return (ArrayList<ProductListing>) The sold listings
+	 */
 	public ArrayList<ProductListing> getSoldAdListings() {
 		return soldAdListings;
 	}
 
+	/**
+	 * Set the keywords
+	 * 
+	 * @param keywords (String) The keywords to set to
+	 */
 	public void setKeyWords(String keywords) {
 		this.keywords = keywords;
 	}

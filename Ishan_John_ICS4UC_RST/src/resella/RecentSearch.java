@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+//Class not implemented in program yet
 public class RecentSearch {
 	private String keywords;
 	private String searchDateTime;

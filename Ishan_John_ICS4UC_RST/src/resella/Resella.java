@@ -46,7 +46,7 @@ public class Resella extends Application{
 	
 	private JFXTextField searchField = new JFXTextField();
 	
-	private String searchKeywords = "iphone x 32gb";
+	private String searchKeywords = "";
 	
 	private ObservableList<ProductListing> productListings;
 	
@@ -63,6 +63,10 @@ public class Resella extends Application{
 	
 	@Override
 	public void start(Stage myStage) throws Exception {
+		
+		
+		searchKeywords = Console.readString("Please enter keywords to use:");
+		
 		searchField.setPromptText("Search...");
 		searchField.setText(searchKeywords);
 		searchField.setOnAction(event -> searchForDeals(searchField.getText()));
@@ -280,6 +284,11 @@ public class Resella extends Application{
 		myStage.show();
 	}
 
+	/**
+	 * Search for deals with the keywords
+	 * 
+	 * @param keywords The keywords to search for
+	 */
 	private void searchForDeals(String keywords) {
 		searchKeywords = keywords;
 		scraper.setKeyWords(searchKeywords);
@@ -297,7 +306,7 @@ public class Resella extends Application{
 		treeView = new JFXTreeTableView<ProductListing>(treeItemRoot);
 		treeView.setShowRoot(false);
 		treeView.setEditable(true);
-		treeView.getColumns().setAll(imgColumn, listingURLColumn, profitColumn, shippingPriceColumn, listingTypeColumn, marketplaceColumn);
+		treeView.getColumns().setAll(imgColumn, listingURLColumn, profitColumn, shippingPriceColumn, listingTypeColumn, marketplaceColumn, locationColumn);
 	}
 
 	public static void main(String[] args) {

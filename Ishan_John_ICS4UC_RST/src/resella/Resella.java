@@ -269,6 +269,9 @@ public class Resella extends Application{
 		Label sellPrice = new Label();
 		sellPrice.textProperty().bind(Bindings.createStringBinding(()->  "Average Sell Price: " + soldListingsMgr.getAverageSellPrice(), soldListingsMgr.averageSellPriceProperty()));
 
+		//Label for telling user where to fileter listings
+		Label filterListingItems = new Label("Filter listings by keyword: ");
+		
 		// Get screen dimensions
 		Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 		screenWidth = primaryScreenBounds.getWidth();
@@ -280,7 +283,7 @@ public class Resella extends Application{
 		
 		/********* TABLEFOOTER ********/
 		// Set the tableFooter's formatting options
-		tableFooter.getChildren().addAll(filterField, size, sellPrice);
+		tableFooter.getChildren().addAll(filterListingItems, filterField, size, sellPrice);
 		
 		/********* ROOT ********/
 		// Set the root's formatting options

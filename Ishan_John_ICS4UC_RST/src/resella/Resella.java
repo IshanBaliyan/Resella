@@ -78,7 +78,12 @@ public class Resella extends Application{
 		
 		searchField.setPromptText("Search...");
 		searchField.setText(searchKeywords);
+		
+		//TODO Does not work (program does not search up listings with new word after executed)
 		searchField.setOnAction(event -> searchForDeals(searchField.getText()));
+		
+		//Since the line set on action does not work, making the text non-editable for now to avoid confusion
+		searchField.setEditable(false);
 		
 		//Declaring a webscraper to scrape information
 		scraper = new WebScraper();

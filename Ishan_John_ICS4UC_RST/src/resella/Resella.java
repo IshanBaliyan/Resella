@@ -28,6 +28,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import simpleIO.Console;
+import simpleIO.Dialog;
 
 public class Resella extends Application{
 
@@ -74,7 +75,7 @@ public class Resella extends Application{
 	public void start(Stage myStage) throws Exception {
 		
 		//Prompting user for the keywords to search for
-		searchKeywords = Console.readString("Please enter keywords to use:");
+		searchKeywords = Dialog.readString("Please enter keywords to use:");
 		
 		searchField.setPromptText("Search...");
 		searchField.setText(searchKeywords);
@@ -90,7 +91,6 @@ public class Resella extends Application{
 		
 		//Declaring a sold listing manager to calculate the average price and use for profit
 		soldListingsMgr = new SoldListingsManager();
-		
 		
 		//Creating columns for information about each listing
 		imgColumn = new JFXTreeTableColumn<>("Product Image");
@@ -118,7 +118,7 @@ public class Resella extends Application{
 		marketplaceColumn.setCellValueFactory(param -> param.getValue().getValue().getMarketplace());
 		
 		locationColumn = new JFXTreeTableColumn<>("Location");
-		locationColumn.setPrefWidth(100);
+		locationColumn.setPrefWidth(200);
 		locationColumn.setCellValueFactory(param -> param.getValue().getValue().getLocation());
 		
 		imgColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>() {
@@ -235,7 +235,7 @@ public class Resella extends Application{
 		marketplaceColumn.setEditable(false);
 		locationColumn.setEditable(false);
 		
-		//Searching for deals with the keywords
+		// Searching for deals with the keywords
 		searchForDeals(searchKeywords);
 
 		JFXTextField filterField = new JFXTextField();
@@ -260,26 +260,29 @@ public class Resella extends Application{
 			}
 		});
 
-		//Displaying the relevant results either filtered or non-filtered
+		// Displaying the relevant results either filtered or non-filtered
 		Label size = new Label();
 		size.textProperty().bind(Bindings.createStringBinding(()-> "Relevant Results: " + treeView.getCurrentItemsCount(),
 				treeView.currentItemsCountProperty()));
 		
-		//Displaying the sell price
+		// Displaying the sell price
 		Label sellPrice = new Label();
 		sellPrice.textProperty().bind(Bindings.createStringBinding(()->  "Average Sell Price: " + soldListingsMgr.getAverageSellPrice(), soldListingsMgr.averageSellPriceProperty()));
 
-		//Label for telling user where to fileter listings
+		// Label for telling user where to filter listings
 		Label filterListingItems = new Label("Filter listings by keyword: ");
 		
 		// Get screen dimensions
 		Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 		screenWidth = primaryScreenBounds.getWidth();
 		screenHeight = primaryScreenBounds.getHeight();
+		
+		/********* LOGO ********/
+		ImageView logoImg = new ImageView(new Image ("/images/ResellaLogo.png", 200, 75, true, true));
 
 		/********* HEADERMENU ********/
 		// Set the headerMenu's formatting options
-		headerMenu.getChildren().addAll(searchField);
+		headerMenu.getChildren().addAll(logoImg, searchField);
 		
 		/********* TABLEFOOTER ********/
 		// Set the tableFooter's formatting options
@@ -310,7 +313,7 @@ public class Resella extends Application{
 		myStage.setTitle("Resella");
 		myStage.setScene(scene);
 		myStage.setMaximized(true);
-		// myStage.getIcons().add(new Image("/images/TTT_logo.png"));
+		myStage.getIcons().add(new Image("/images/Resella_Logo.png"));
 		myStage.show();
 	}
 
@@ -325,7 +328,7 @@ public class Resella extends Application{
 		scraper.setKeyWords(searchKeywords);
 		scraper.scrapeListings();
 		
-		//Calculating the average sell price for the listings solds with the keywords
+		// Calculating the average sell price for the listings solds with the keywords
 		soldListingsMgr.setSoldListings(scraper.getSoldAdListings());
 		soldListingsMgr.resetFilteredListings();
 		soldListingsMgr.calculateAverageSellPrice();

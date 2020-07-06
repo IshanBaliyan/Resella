@@ -93,10 +93,10 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		
 		setSellPrice(newPrice);
 		sellPrice.addListener((observable, oldValue, newValue) -> {
-			profit = new SimpleDoubleProperty((sellPrice.getValue() / price.getValue()) * 100.0 + 100.0);
+			profit = new SimpleDoubleProperty((sellPrice.getValue() / price.getValue()) * 100.0 - 100.0);
 		});
 		
-		profit = new SimpleDoubleProperty((sellPrice.getValue() / price.getValue()) * 100.0 + 100.0);
+		profit = new SimpleDoubleProperty((sellPrice.getValue() / price.getValue()) * 100.0 - 100.0);
 	}
 	
 	/**

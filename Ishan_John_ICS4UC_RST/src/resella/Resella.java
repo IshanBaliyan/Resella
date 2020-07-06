@@ -73,6 +73,7 @@ public class Resella extends Application{
 	private JFXTreeTableColumn<ProductListing, String> imgColumn;
 	private JFXTreeTableColumn<ProductListing, ProductListing.ProductLink> listingURLColumn;
 	private JFXTreeTableColumn<ProductListing, Double> profitColumn;
+	private JFXTreeTableColumn<ProductListing, Double> priceColumn;
 	private JFXTreeTableColumn<ProductListing, String> shippingPriceColumn;
 	private JFXTreeTableColumn<ProductListing, String> listingTypeColumn;
 	private JFXTreeTableColumn<ProductListing, String> marketplaceColumn;
@@ -110,9 +111,13 @@ public class Resella extends Application{
 		listingURLColumn.setPrefWidth(200);
 		listingURLColumn.setCellValueFactory(param -> param.getValue().getValue().getListingURL());
 		
-		profitColumn = new JFXTreeTableColumn<>("Potential Profit (Shipping Not Included)");
+		profitColumn = new JFXTreeTableColumn<>("Potential Profit (shipping included)");
 		profitColumn.setPrefWidth(200);
 		profitColumn.setCellValueFactory(param -> param.getValue().getValue().getProfit().asObject());
+		
+		priceColumn = new JFXTreeTableColumn<>("Price");
+		priceColumn.setPrefWidth(150);
+		priceColumn.setCellValueFactory(param -> param.getValue().getValue().getPrice().asObject());
 		
 		shippingPriceColumn = new JFXTreeTableColumn<>("Shipping Price + Availability");
 		shippingPriceColumn.setPrefWidth(150);
@@ -181,6 +186,20 @@ public class Resella extends Application{
 			}
 		});
 		
+		priceColumn.setCellFactory(column -> new TreeTableCell<ProductListing, Double>(){
+			@Override
+			protected void updateItem(Double item, boolean empty) {
+
+				super.updateItem(item, empty);
+				if(item == null || empty) {
+                    setText(null);
+
+				}else {
+					setText(Console.roundDouble(item.doubleValue(), 2));
+				}
+			}
+		});
+		
 		shippingPriceColumn.setCellFactory(column -> new TreeTableCell<ProductListing, String>(){
 			@Override
 			protected void updateItem(String item, boolean empty) {
@@ -241,6 +260,7 @@ public class Resella extends Application{
 		imgColumn.setEditable(false);
 		listingURLColumn.setEditable(false);
 		profitColumn.setEditable(false);
+		priceColumn.setEditable(false);
 		shippingPriceColumn.setEditable(false);
 		listingTypeColumn.setEditable(false);
 		marketplaceColumn.setEditable(false);
@@ -357,7 +377,7 @@ public class Resella extends Application{
 		treeView = new JFXTreeTableView<ProductListing>(treeItemRoot);
 		treeView.setShowRoot(false);
 		treeView.setEditable(true);
-		treeView.getColumns().setAll(imgColumn, listingURLColumn, profitColumn, shippingPriceColumn, listingTypeColumn, marketplaceColumn, locationColumn);
+		treeView.getColumns().setAll(imgColumn, listingURLColumn, profitColumn, priceColumn, shippingPriceColumn, listingTypeColumn, marketplaceColumn, locationColumn);
 	}
 
 	public static void main(String[] args) {

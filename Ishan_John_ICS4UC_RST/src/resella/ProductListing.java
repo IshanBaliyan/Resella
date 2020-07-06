@@ -44,6 +44,8 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 	public static final String KIJIJI = "Kijiji";
 	public static final String CRAIGSLIST = "Craiglist";
 	public static final String FACEBOOK_MARKETPLACE = "Facebook Marketplace";
+	public static final String PICK_UP_ONLY = "PICK UP ONLY";
+	public static final String UNSET = "UNSET";
 	
 	public static final String DEFAULT_IMG = "https://ir.ebaystatic.com/cr/v/c1/ebay-logo-1-1200x630-margin.png";
 	
@@ -91,12 +93,21 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		this.marketplace = new SimpleStringProperty(marketplace);
 		this.tags =  FXCollections.observableArrayList(tags);
 		
+		double shippingPrice;
+		
+		if(orderMethod.equals(PICK_UP_ONLY) || orderMethod.isEmpty() || orderMethod.equals(UNSET)) {
+			shippingPrice = 0;
+		}
+		else {
+			shippingPrice = Double.parseDouble(orderMethod);
+		}
+		
 		setSellPrice(newPrice);
 		sellPrice.addListener((observable, oldValue, newValue) -> {
-			profit = new SimpleDoubleProperty((sellPrice.getValue() / price.getValue()) * 100.0 - 100.0);
+			profit = new SimpleDoubleProperty((sellPrice.getValue() / (price.getValue() + shippingPrice)) * 100.0 - 100.0);
 		});
 		
-		profit = new SimpleDoubleProperty((sellPrice.getValue() / price.getValue()) * 100.0 - 100.0);
+		profit = new SimpleDoubleProperty((sellPrice.getValue() / (price.getValue() + shippingPrice)) * 100.0 - 100.0);
 	}
 	
 	/**

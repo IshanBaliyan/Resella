@@ -165,7 +165,7 @@ public class Resella extends Application{
                     setText(null);
 
 				}else {
-					setText(Console.roundDouble(item.doubleValue(), 2));
+					setText(Console.roundDouble(item.doubleValue(), 2) + "%");
 				}
 			}
 		});

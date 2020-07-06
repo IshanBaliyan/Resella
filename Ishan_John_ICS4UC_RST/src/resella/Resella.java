@@ -14,6 +14,7 @@ import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -24,6 +25,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -37,6 +39,14 @@ public class Resella extends Application{
 
 	private static double screenWidth;
 	private static double screenHeight;
+	
+	// Quit dialog
+	private JFXDialog imgZoomedDialog;
+
+	// The content of the quit dialog is a HBox
+	private HBox imgZoomedContent = new HBox(GAP);
+	
+	private ImageView imgZoomed;
 
 	// The root is a StackPane, so dialogs can be used
 	private StackPane dialogRoot = new StackPane();
@@ -72,8 +82,7 @@ public class Resella extends Application{
 	private JFXTreeTableView<ProductListing> treeView;
 	
 	@Override
-	public void start(Stage myStage) throws Exception {
-		
+	public void start(Stage myStage) throws Exception {		
 		//Prompting user for the keywords to search for
 		searchKeywords = Dialog.readString("Please enter keywords to use:");
 		
@@ -132,8 +141,10 @@ public class Resella extends Application{
 			@Override
 			protected void updateItem(String item, boolean empty) {
 				super.updateItem(item, empty);
+				super.setOnMouseClicked(clickEventHandler);
 				if(item != null) {
 					imageView.setImage(new Image(item, 150, 150, true, true));
+					imageView.setOnMouseClicked(clickEventHandler);
 				}
 			}
 		});
@@ -278,7 +289,12 @@ public class Resella extends Application{
 		screenHeight = primaryScreenBounds.getHeight();
 		
 		/********* LOGO ********/
+		// Set the logoImg's formatting options
 		ImageView logoImg = new ImageView(new Image ("/images/ResellaLogo.png", 200, 75, true, true));
+		
+		/********* IMGZOOMEDCONTENT ********/
+		// Set the imgZoomedContent's formatting options
+		imgZoomedContent.setPadding(new Insets(GAP, GAP, GAP, GAP));
 
 		/********* HEADERMENU ********/
 		// Set the headerMenu's formatting options
@@ -347,4 +363,19 @@ public class Resella extends Application{
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
+	// Mouse click event handler
+	EventHandler<MouseEvent> clickEventHandler = new EventHandler<MouseEvent>() {
+		@Override
+		public void handle(MouseEvent event) {
+			imgZoomedContent.getChildren().clear();
+			TreeTableCell<ProductListing, String> temp = (TreeTableCell<ProductListing, String>) event.getSource();
+			String imgURL = temp.getItem();
+			imgZoomed = new ImageView(new Image(imgURL, screenWidth / 2.0, screenHeight / 2.0, true , true));
+			imgZoomedContent.getChildren().add(imgZoomed);
+			
+			imgZoomedDialog = new JFXDialog(dialogRoot, imgZoomedContent, JFXDialog.DialogTransition.CENTER);
+			imgZoomedDialog.show();
+		}
+	};
 }

@@ -87,6 +87,13 @@ public class Resella extends Application{
 		//Prompting user for the keywords to search for
 		searchKeywords = Dialog.readString("Please enter keywords to use:");
 		
+		while(searchKeywords.isEmpty()) {
+			
+			//Prompting user for the keywords to search for
+			searchKeywords = Dialog.readString("Invalid input. Please enter valid keywords to use:");
+			
+		}
+		
 		searchField.setPromptText("Search...");
 		searchField.setText(searchKeywords);
 		

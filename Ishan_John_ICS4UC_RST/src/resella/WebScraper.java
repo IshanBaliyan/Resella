@@ -116,22 +116,25 @@ public class WebScraper {
 				this.numListings += numListings;
 			}
 
-			// Get the list of repositories
-			Elements searchItems = doc.getElementsByClass("s-item__image");
+			// Retrieve the individual listings
+			Elements searchItems = doc.getElementsByClass("s-item__wrapper clearfix");
 
 			int counter = 0;
 			// Canadian repo code:rsHdr (not used here but for future reference)
 			for (Element searchItem : searchItems) {
-
-				counter++;
-				Element link = searchItem.select("a[href]").first();
-				String href = link.attr("href");
-				if (!href.isEmpty()) {
-
-					// get the value from the href attribute
-					System.out.println("\nlink "+ counter + ": " + href);
-					scrapeListingEBay(href, isActiveListings);
-
+				Element sponsoredElement = searchItem.getElementsByClass("s-item__title--tagblock").first();
+				if (sponsoredElement == null || isActiveListings == false) {
+					Element imageElement = searchItem.getElementsByClass("s-item__image").first();
+	
+					counter++;
+					Element link = imageElement.select("a[href]").first();
+					String href = link.attr("href");
+					if (!href.isEmpty()) {
+	
+						// get the value from the href attribute
+						System.out.println("\nlink "+ counter + ": " + href);
+						scrapeListingEBay(href, isActiveListings);
+					}
 				}
 
 			}

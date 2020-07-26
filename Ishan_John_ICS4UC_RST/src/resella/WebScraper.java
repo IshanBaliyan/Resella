@@ -184,6 +184,8 @@ public class WebScraper {
 
 			String[] listingLinkClasses = {"nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5", "vi-inl-lnk vi-original-listing", "ogitm", "u-flL w29 vi-price"};
 
+			String currency = "";
+			
 			if(priceElement == null) {
 
 				for (int i = 0; i < listingLinkClasses.length; i++) {
@@ -205,12 +207,37 @@ public class WebScraper {
 			else {
 
 				try {
-					if(priceElement.hasAttr("content")) {
-						price = Double.parseDouble(priceElement.attr("content"));
-					}
-					else{
-						price = Double.parseDouble(priceElement.text().replaceAll("[A-Z]+|[\\$ ,]", ""));
-					}
+//					if(priceElement.hasAttr("content")) {
+//						price = Double.parseDouble(priceElement.attr("content"));
+//					}
+					//else{
+						//price = Double.parseDouble(priceElement.text().replaceAll("[A-Z]+|[\\$ ,]", ""));
+					//}
+						
+						
+						//Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
+					String fullPriceStr = priceElement.text();
+                    Pattern r = Pattern.compile("^[A-Z]+");
+                    Matcher m = r.matcher(fullPriceStr);
+                    
+                    
+                    if (m.find()) {
+                        currency = m.group(0);
+                        //System.out.println(currency);
+                        if (currency.equals("US") == false) {
+                        	
+                            fullPriceStr = doc.getElementById("convbinPrice").text();
+                            
+                            if(fullPriceStr.isEmpty()) {
+                            	 fullPriceStr = doc.getElementById("convbidPrice").text();
+                            }
+                            
+                            //System.out.println(fullPriceStr);
+                        }
+                            price = Double.parseDouble(fullPriceStr.replaceAll("[a-z]+|[A-Z]+|[\\$ ,\\(\\)]", ""));
+                    }
+                    
+			
 
 				} catch (NullPointerException | NumberFormatException e) {
 					Elements originalListingLink = priceElement.select("a[href]");
@@ -227,6 +254,8 @@ public class WebScraper {
 					}
 
 				}
+				
+				
 
 				//TODO Currency retrieval
 

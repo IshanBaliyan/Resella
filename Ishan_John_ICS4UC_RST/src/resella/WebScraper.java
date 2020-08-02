@@ -153,6 +153,10 @@ public class WebScraper {
 		ProductListing scrapedListing = new ProductListing();
 		ArrayList<String> tags = new ArrayList<String>();
 		String listingType = ProductListing.BUY_IT_NOW_LISTING;
+		
+		if (productURL.contentEquals("https://www.ebay.com/itm/Nov-88-LINFIELD-v-GLENTORAN-Irish-League-Cup-Final/193579984584?hash=item2d124426c8:g:QbIAAOSw7BdevQni")) {
+			System.out.println("F");			
+		}
 
 		boolean isSuccessful = true;
 		try {
@@ -183,8 +187,6 @@ public class WebScraper {
 			}
 
 			String[] listingLinkClasses = {"nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5", "vi-inl-lnk vi-original-listing", "ogitm", "u-flL w29 vi-price"};
-
-			String currency = "";
 			
 			if(priceElement == null) {
 
@@ -205,41 +207,26 @@ public class WebScraper {
 				isSuccessful = false;
 			}
 			else {
-
-				try {
-//					if(priceElement.hasAttr("content")) {
-//						price = Double.parseDouble(priceElement.attr("content"));
-//					}
-					//else{
-						//price = Double.parseDouble(priceElement.text().replaceAll("[A-Z]+|[\\$ ,]", ""));
-					//}
-						
-						
-						//Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
 					String fullPriceStr = priceElement.text();
-                    Pattern r = Pattern.compile("^[A-Z]+");
-                    Matcher m = r.matcher(fullPriceStr);
+					Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
+                    Matcher priceMatcher = pricePattern.matcher(fullPriceStr);
                     
-                    
-                    if (m.find()) {
-                        currency = m.group(0);
-                        //System.out.println(currency);
+                    if (priceMatcher.find()) {
+                    	Pattern currencyPattern = Pattern.compile("^[A-Z]+");
+                        Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
+                        currencyMatcher.find();
+                        String currency = currencyMatcher.group(0);
+                        
                         if (currency.equals("US") == false) {
-                        	
-                            fullPriceStr = doc.getElementById("convbinPrice").text();
-                            
-                            if(fullPriceStr.isEmpty()) {
-                            	 fullPriceStr = doc.getElementById("convbidPrice").text();
+                        	Element convPriceElement = doc.getElementById("convbinPrice");
+                            if (convPriceElement == null) {
+                            	convPriceElement = doc.getElementById("convbidPrice");
                             }
-                            
-                            //System.out.println(fullPriceStr);
+                            fullPriceStr = convPriceElement.text();
                         }
                             price = Double.parseDouble(fullPriceStr.replaceAll("[a-z]+|[A-Z]+|[\\$ ,\\(\\)]", ""));
                     }
-                    
-			
-
-				} catch (NullPointerException | NumberFormatException e) {
+                    else {
 					Elements originalListingLink = priceElement.select("a[href]");
 
 					for (Element link : originalListingLink) {
@@ -252,7 +239,6 @@ public class WebScraper {
 							return scrapeListingEBay(href, isActiveListings);	
 						}
 					}
-
 				}
 				
 				
@@ -267,14 +253,20 @@ public class WebScraper {
 
 				//Scrape shipping price
 				Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
-				Pattern r = Pattern.compile("[0-9]+\\.[0-9]+");
-				Matcher m = r.matcher(shippingPriceElement.text());
+				String shippingPriceStr = shippingPriceElement.text();
+                Pattern shippingPricePattern = Pattern.compile("^[A-Z]+");
+                Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
+                
+                if (shippingPriceMatcher.find()) {
+                    String currency = shippingPriceMatcher.group(0);
+                    if (currency.equals("US") == false) {
+                    	shippingPriceStr = doc.getElementById("convetedPriceId").text();
+                    }  
+                }
 
 				//Reformat shipping price to a double
 				double shippingPrice = 0;
-				if (m.find( )) {
-					shippingPrice = Double.parseDouble(m.group(0).replaceAll(",", ""));
-				}
+				shippingPrice = Double.parseDouble(shippingPriceStr.replaceAll("[A-Z]+|[\\$ ,]", ""));
 
 				//Scrape the location of the listing
 				Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");

@@ -1,4 +1,5 @@
 package resella;
+
 /**
  * @author Ishan Baliyan and John Wolf
  * Date June 2020
@@ -17,7 +18,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-
 public class WebScraper {
 
 	// Declaring variables for use in class
@@ -26,7 +26,7 @@ public class WebScraper {
 	private String kijijiSearchID = "k0l9004";
 	private String kijijiLocation = "ontario";
 	private ArrayList<ProductListing> activeAdListings = new ArrayList<ProductListing>();
-	private ArrayList<ProductListing> soldAdListings  = new ArrayList<ProductListing>();
+	private ArrayList<ProductListing> soldAdListings = new ArrayList<ProductListing>();
 
 	/**
 	 * Constructor for adding keywords
@@ -54,7 +54,7 @@ public class WebScraper {
 			// the user
 
 			/*
-			Commenting out for going straight to the sold listings
+			 * Commenting out for going straight to the sold listings
 			 */
 			String eBayResultsURL = "https://www.ebay.com/sch/i.html?_from=R40&_nkw=" + keywords;
 			scrapeSearchResultsEBay(eBayResultsURL, true);
@@ -65,15 +65,14 @@ public class WebScraper {
 			scrapeSearchResultsKijiji(activeKijijiResultsURL);
 		}
 
-		//TODO Fix timeout exception
-		//		catch(SocketTimeoutException e) {
-		//			
-		//			
-		//		}
+		// TODO Fix timeout exception
+		// catch(SocketTimeoutException e) {
+		//
+		//
+		// }
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
 
 	}
 
@@ -89,11 +88,10 @@ public class WebScraper {
 		searchURL += "&_ipg=100";
 
 		// Based on active listings or sold listings,
-		if(isActiveListings) {
+		if (isActiveListings) {
 			// Sorts listings from price lowest to highest (find cheapest listings)
 			// searchURL += "&_sop=15";
-		}
-		else {
+		} else {
 			// Filters sold listings only
 			searchURL += "&LH_Sold=1";
 		}
@@ -125,14 +123,14 @@ public class WebScraper {
 				Element sponsoredElement = searchItem.getElementsByClass("s-item__title--tagblock").first();
 				if (sponsoredElement == null || isActiveListings == false) {
 					Element imageElement = searchItem.getElementsByClass("s-item__image").first();
-	
+
 					counter++;
 					Element link = imageElement.select("a[href]").first();
 					String href = link.attr("href");
 					if (!href.isEmpty()) {
-	
+
 						// get the value from the href attribute
-						System.out.println("\nlink "+ counter + ": " + href);
+						System.out.println("\nlink " + counter + ": " + href);
 						scrapeListingEBay(href, isActiveListings);
 					}
 				}
@@ -153,10 +151,6 @@ public class WebScraper {
 		ProductListing scrapedListing = new ProductListing();
 		ArrayList<String> tags = new ArrayList<String>();
 		String listingType = ProductListing.BUY_IT_NOW_LISTING;
-		
-		if (productURL.contentEquals("https://www.ebay.com/itm/Nov-88-LINFIELD-v-GLENTORAN-Irish-League-Cup-Final/193579984584?hash=item2d124426c8:g:QbIAAOSw7BdevQni")) {
-			System.out.println("F");			
-		}
 
 		boolean isSuccessful = true;
 		try {
@@ -168,124 +162,110 @@ public class WebScraper {
 			Elements titleElement = doc.getElementsByClass("it-ttl");
 			String title = titleElement.text().replaceFirst("Details about ", "");
 
+			String[] listingLinkClasses = { "nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5",
+					"vi-inl-lnk vi-original-listing", "ogitm", "u-flL w29 vi-price" };
+
+			for (int i = 0; i < listingLinkClasses.length; i++) {
+				Elements linkElements = doc.getElementsByClass(listingLinkClasses[i]);
+
+				for (Element linkElement : linkElements) {
+					if (linkElement != null) {
+						Elements originalListingLink = linkElement.select("a[href]");
+
+						for (Element link : originalListingLink) {
+
+							String href = link.attr("href");
+
+							if (!href.isEmpty()) {
+
+								// get the value from the href attribute
+								return scrapeListingEBay(href, isActiveListings);
+							}
+						}
+					}
+
+				}
+
+			}
+
 			Element priceElement = null;
 			double price = 0;
 
-			// Scrape price:
-			String[] priceIDs = {"prcIsum", "prcIsum_bidPrice", "mm-saleDscPrc"};
+			String[] priceIDs = { "prcIsum", "prcIsum_bidPrice", "mm-saleDscPrc" };
 
 			for (int i = 0; i < priceIDs.length; i++) {
 				priceElement = doc.getElementById(priceIDs[i]);
 
-				if(priceElement != null) {
+				if (priceElement != null) {
 					if (priceIDs[i].equals("prcIsum_bidPrice")) {
-						 listingType = ProductListing.AUCTION_LISTING;
+						listingType = ProductListing.AUCTION_LISTING;
 					}
 					break;
 				}
 
 			}
 
-			String[] listingLinkClasses = {"nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5", "vi-inl-lnk vi-original-listing", "ogitm", "u-flL w29 vi-price"};
-			
-			if(priceElement == null) {
-
-				for (int i = 0; i < listingLinkClasses.length; i++) {
-					Elements linkElements = doc.getElementsByClass(listingLinkClasses[i]);
-
-					for (Element linkElement : linkElements) {
-						if(linkElement != null) {
-							priceElement = linkElement;
-							break;
-						}
-					}
-
-				}
-			}
-
-			if(priceElement == null) {
+			if (priceElement == null) {
 				isSuccessful = false;
-			}
-			else {
-					String fullPriceStr = priceElement.text();
-					Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
-                    Matcher priceMatcher = pricePattern.matcher(fullPriceStr);
-                    
-                    if (priceMatcher.find()) {
-                    	Pattern currencyPattern = Pattern.compile("^[A-Z]+");
-                        Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
-                        currencyMatcher.find();
-                        String currency = currencyMatcher.group(0);
-                        
-                        if (currency.equals("US") == false) {
-                        	Element convPriceElement = doc.getElementById("convbinPrice");
-                            if (convPriceElement == null) {
-                            	convPriceElement = doc.getElementById("convbidPrice");
-                            }
-                            fullPriceStr = convPriceElement.text();
-                        }
-                            price = Double.parseDouble(fullPriceStr.replaceAll("[a-z]+|[A-Z]+|[\\$ ,\\(\\)]", ""));
-                    }
-                    else {
-					Elements originalListingLink = priceElement.select("a[href]");
+			} else {
+				String fullPriceStr = priceElement.text();
+				Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
+				Matcher priceMatcher = pricePattern.matcher(fullPriceStr);
 
-					for (Element link : originalListingLink) {
+				if (priceMatcher.find()) {
+					Pattern currencyPattern = Pattern.compile("^[A-Z]+");
+					Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
+					currencyMatcher.find();
+					String currency = currencyMatcher.group(0);
 
-						String href = link.attr("href");
-
-						if (!href.isEmpty()) {
-
-							// get the value from the href attribute
-							return scrapeListingEBay(href, isActiveListings);	
+					if (currency.equals("US") == false) {
+						Element convPriceElement = doc.getElementById("convbinPrice");
+						if (convPriceElement == null) {
+							convPriceElement = doc.getElementById("convbidPrice");
 						}
+						fullPriceStr = convPriceElement.text();
 					}
+					price = Double.parseDouble(fullPriceStr.replaceAll("[a-z]+|[A-Z]+|[\\$ ,\\(\\)]", ""));
 				}
-				
-				
 
-				//TODO Currency retrieval
-
-				//prcIsum
-
-				//Scrape image URL
+				// Scrape image URL
 				Element imageElement = doc.getElementById("icImg");
-				String imgURL = imageElement.attr("src"); 
+				String imgURL = imageElement.attr("src");
 
-				//Scrape shipping price
+				// Scrape shipping price
 				Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
 				String shippingPriceStr = shippingPriceElement.text();
-                Pattern shippingPricePattern = Pattern.compile("^[A-Z]+");
-                Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
-                
-                if (shippingPriceMatcher.find()) {
-                    String currency = shippingPriceMatcher.group(0);
-                    if (currency.equals("US") == false) {
-                    	shippingPriceStr = doc.getElementById("convetedPriceId").text();
-                    }  
-                }
+				Pattern shippingPricePattern = Pattern.compile("^[A-Z]+");
+				Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
 
-				//Reformat shipping price to a double
+				if (shippingPriceMatcher.find()) {
+					String currency = shippingPriceMatcher.group(0);
+					if (currency.equals("US") == false) {
+						shippingPriceStr = doc.getElementById("convetedPriceId").text();
+					}
+				}
+
+				// Reformat shipping price to a double
 				double shippingPrice = 0;
 				shippingPrice = Double.parseDouble(shippingPriceStr.replaceAll("[A-Z]+|[\\$ ,]", ""));
 
-				//Scrape the location of the listing
+				// Scrape the location of the listing
 				Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
 				String location = availableLocation.text();
 
 				// Create scrapedListing
-				scrapedListing = new ProductListing(imgURL, price, "" + shippingPrice, location, title, productURL, listingType,
-						ProductListing.EBAY, tags);
+				scrapedListing = new ProductListing(imgURL, price, "" + shippingPrice, location, title, productURL,
+						listingType, ProductListing.EBAY, tags);
 
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		if(isSuccessful && isActiveListings) {
+		if (isSuccessful && isActiveListings) {
 			scrapedListing.setIsSold(false);
 			activeAdListings.add(scrapedListing);
-		}
-		else if(isSuccessful && !isActiveListings){
+		} else if (isSuccessful && !isActiveListings) {
 			scrapedListing.setIsSold(true);
 			soldAdListings.add(scrapedListing);
 		}
@@ -327,12 +307,11 @@ public class WebScraper {
 
 				if (!href.isEmpty()) {
 
-					if(href.contains("https:")) {
-						System.out.println("\nlink "+ counter + ": " +  href);
+					if (href.contains("https:")) {
+						System.out.println("\nlink " + counter + ": " + href);
 						System.out.println("Cannot access links that are not from https://www.kijiji.ca");
-					}
-					else {
-						System.out.println("\nlink "+ counter + ": " + "https://www.kijiji.ca"+  href);
+					} else {
+						System.out.println("\nlink " + counter + ": " + "https://www.kijiji.ca" + href);
 
 						// get the value from the href attribute
 						scrapeListingKijiji("https://www.kijiji.ca" + href);
@@ -368,20 +347,21 @@ public class WebScraper {
 			Element priceElement = listing.getElementsByClass("currentPrice-2842943473").first();
 			String priceStr = priceElement.text().replaceAll("[\\$,]", "").replace("Free", "0");
 
-			//Price of the product
+			// Price of the product
 			double price = 0;
-			
-			//Using regix to filter out unwanted information from the variable
+
+			// Using regix to filter out unwanted information from the variable
 			Pattern r = Pattern.compile("[0-9]+\\.[0-9]{2}");
 			Matcher m = r.matcher(priceStr);
 
-			//If there is no price, just skip the listing (please contact means you have to contact for the price)
-			if(priceStr.equals("Please Contact") || !m.find()) {
+			// If there is no price, just skip the listing (please contact means you have to
+			// contact for the price)
+			if (priceStr.equals("Please Contact") || !m.find()) {
 
-				//Checking if the web scraper was able to pull successful listings without a "Please Contact" for the price
+				// Checking if the web scraper was able to pull successful listings without a
+				// "Please Contact" for the price
 				isSuccessful = false;
-			}
-			else {
+			} else {
 				priceStr = m.group();
 				price = Double.parseDouble(priceStr);
 			}
@@ -392,29 +372,27 @@ public class WebScraper {
 				Element presentation = listing.getElementById("mainHeroImage");
 				Element image = presentation.getElementsByTag("img").first();
 				imageURL = image.attr("src");
-			}
-			catch (NullPointerException e) {
+			} catch (NullPointerException e) {
 				System.out.println("No image found");
 				isSuccessful = false;
 			}
 
-			//Can't ship orders for kijii
+			// Can't ship orders for kijii
 			String orderMethod = "PICK UP ONLY";
 
-			//Scrape the location of the listing
+			// Scrape the location of the listing
 			Elements availableLocation = listing.getElementsByAttributeValue("itemprop", "address");
 			String location = availableLocation.text();
 
 			// Create scrapedListing
-			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL, ProductListing.BUY_IT_NOW_LISTING,
-					ProductListing.KIJIJI, tags);
+			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL,
+					ProductListing.BUY_IT_NOW_LISTING, ProductListing.KIJIJI, tags);
 
 			// In case of any IO errors, we want the messages written to the console
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if(isSuccessful) {
+		if (isSuccessful) {
 			activeAdListings.add(scrapedListing);
 		}
 

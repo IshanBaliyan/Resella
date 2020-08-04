@@ -209,23 +209,22 @@ public class WebScraper {
 				isSuccessful = false;
 			} else {
 				String fullPriceStr = priceElement.text();
-				Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
-				Matcher priceMatcher = pricePattern.matcher(fullPriceStr);
+				Pattern currencyPattern = Pattern.compile("^[A-Z]+");
+				Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
+				currencyMatcher.find();
+				String priceCurrency = currencyMatcher.group(0);
 
-				if (priceMatcher.find()) {
-					Pattern currencyPattern = Pattern.compile("^[A-Z]+");
-					Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
-					currencyMatcher.find();
-					String currency = currencyMatcher.group(0);
-
-					if (currency.equals("US") == false) {
-						Element convPriceElement = doc.getElementById("convbinPrice");
-						if (convPriceElement == null) {
-							convPriceElement = doc.getElementById("convbidPrice");
-						}
-						fullPriceStr = convPriceElement.text();
+				if (priceCurrency.equals("US") == false) {
+					Element convPriceElement = doc.getElementById("convbinPrice");
+					if (convPriceElement == null) {
+						convPriceElement = doc.getElementById("convbidPrice");
 					}
-					price = Double.parseDouble(fullPriceStr.replaceAll("[a-z]+|[A-Z]+|[\\$ ,\\(\\)]", ""));
+					fullPriceStr = convPriceElement.text();
+				}
+				Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
+				Matcher priceMatcher = pricePattern.matcher(fullPriceStr.replace(",", ""));
+				if (priceMatcher.find()) {
+					price = Double.parseDouble(priceMatcher.group(0));
 				}
 
 				// Scrape image URL
@@ -233,28 +232,42 @@ public class WebScraper {
 				String imgURL = imageElement.attr("src");
 
 				// Scrape shipping price
-				Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
-				String shippingPriceStr = shippingPriceElement.text();
-				Pattern shippingPricePattern = Pattern.compile("^[A-Z]+");
-				Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
+				Elements shippingPriceParentElement = doc.getElementsByClass("u-flL sh-col");
+				String shippingPriceStr = shippingPriceParentElement.text();
+				Pattern shippingCurrencyPattern = Pattern.compile("^[A-Z]+");
+				Matcher shippingCurrencyMatcher = shippingCurrencyPattern.matcher(shippingPriceStr);
 
-				if (shippingPriceMatcher.find()) {
-					String currency = shippingPriceMatcher.group(0);
-					if (currency.equals("US") == false) {
-						shippingPriceStr = doc.getElementById("convetedPriceId").text();
+				if (shippingCurrencyMatcher.find()) {
+					String shippingCurrency = shippingCurrencyMatcher.group(0);
+					if (shippingCurrency.equals("US") == false) {
+						Element shippingPriceElement = doc.getElementById("convetedPriceId");
+						if (shippingPriceElement != null) {
+							shippingPriceStr = shippingPriceElement.text();
+						}
+						else {
+							shippingPriceStr = shippingPriceParentElement.text();
+							if (shippingPriceStr.toLowerCase().contains("free")) {
+								shippingPriceStr = "Free";
+							}
+							else if (shippingPriceStr.toLowerCase().contains("calculate")) {
+								shippingPriceStr = "Check listing for shipping details";
+							}
+						}
 					}
 				}
 
-				// Reformat shipping price to a double
-				double shippingPrice = 0;
-				shippingPrice = Double.parseDouble(shippingPriceStr.replaceAll("[A-Z]+|[\\$ ,]", ""));
+				Pattern shippingPricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
+				Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
+				if (shippingPriceMatcher.find()) {
+					shippingPriceStr = shippingPriceMatcher.group(0);
+				}
 
 				// Scrape the location of the listing
 				Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
 				String location = availableLocation.text();
 
 				// Create scrapedListing
-				scrapedListing = new ProductListing(imgURL, price, "" + shippingPrice, location, title, productURL,
+				scrapedListing = new ProductListing(imgURL, price, shippingPriceStr, location, title, productURL,
 						listingType, ProductListing.EBAY, tags);
 
 			}

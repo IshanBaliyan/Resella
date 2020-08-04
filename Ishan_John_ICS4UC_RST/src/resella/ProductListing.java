@@ -95,11 +95,11 @@ public class ProductListing extends RecursiveTreeObject<ProductListing> {
 		
 		double shippingPrice;
 		
-		if(orderMethod.equals(PICK_UP_ONLY) || orderMethod.isEmpty() || orderMethod.equals(UNSET)) {
-			shippingPrice = 0;
+		if(orderMethod.matches("\\d+(\\.\\d+)?")) {
+			shippingPrice = Double.parseDouble(orderMethod);
 		}
 		else {
-			shippingPrice = Double.parseDouble(orderMethod);
+			shippingPrice = 0;
 		}
 		
 		setSellPrice(newPrice);

@@ -13,6 +13,11 @@ Thus, the name of the application is Resella.
 The program can scrape as many products as you want (although the code has been set to a default of 40 products on each marketplace) and theoretically, someone could run the program and potentitally find extremely low price listings after filtering through thousands of products in different marketplaces and resell them back on the marketplace.
 
 ![image](https://user-images.githubusercontent.com/43831507/100687724-d04b6600-334e-11eb-99d9-f282f6096103.png)
+
+The user can also filter certain information to get a desired listing that only have those features (e.g. preferred location for pickup, preferred product colour, preferred manufacturing date, preferred size, etc...)
+![image](https://user-images.githubusercontent.com/43831507/100688065-7a2af280-334f-11eb-88d2-3334a46b66ef.png)
+
+The user can browse images of the products up close
 ![image](https://user-images.githubusercontent.com/43831507/100687838-0b4d9980-334f-11eb-83b4-06dae67b484d.png)
 
 

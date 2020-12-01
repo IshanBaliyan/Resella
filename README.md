@@ -1,3 +1,5 @@
+![image](https://user-images.githubusercontent.com/43831507/100688976-8fa11c00-3351-11eb-9cea-e5cf2cb69e52.png)
+
 # Resella
 
 ## This is a web scraper that scrapes websites, such as EBay and Kijiji, for listings of products and organizes them for the best deals.

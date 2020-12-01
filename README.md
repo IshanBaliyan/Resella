@@ -7,7 +7,7 @@
 The application was made as an assignment for the course ICS 4U (Grade 12 Computer Science) and the two authors are Ishan Baliyan and John Wolf. As seen by the program *insights* on GitHub, the project took several months to build.
 
 The program scrapes information for online products such as name, location, image, auction listing, link, price, shipping price and more (while also filtering out sponsored listings).
-Then, the program allows the user to organize the information by calculating the average sell price of the product and determine which products are the best deal and below market-value.
+Then, the program allows the user to organize the information by calculating the average sell price of the product and determining which products are the best deal and below market-value.
 
 Furthermore, individuals can use the program to find less expensive products for a lower price (since some people just want to get rid of their old stuff at a overly low price) and the user of the program could theortically RESELL it back on EBay/kijiji for a higher price.
 Thus, the name of the application is Resella.

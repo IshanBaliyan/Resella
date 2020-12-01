@@ -156,309 +156,314 @@ public class WebScraper {
 		try {
 
 			// Here we create a document object and use JSoup to fetch the website
-			Document doc = Jsoup.connect(productURL).get();
+			try {
+				Document doc = Jsoup.connect(productURL).get();
 
-			// Scrape title:
-			Elements titleElement = doc.getElementsByClass("it-ttl");
-			String title = titleElement.text().replaceFirst("Details about ", "");
+				// Scrape title:
+				Elements titleElement = doc.getElementsByClass("it-ttl");
+				String title = titleElement.text().replaceFirst("Details about ", "");
 
-			String[] listingLinkClasses = { "nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5",
-					"vi-inl-lnk vi-original-listing", "ogitm", "u-flL w29 vi-price" };
+				String[] listingLinkClasses = { "nodestar-item-card-details__view", "vi-inl-lnk vi-cvip-prel5",
+						"vi-inl-lnk vi-original-listing", "ogitm", "u-flL w29 vi-price" };
 
-			for (int i = 0; i < listingLinkClasses.length; i++) {
-				Elements linkElements = doc.getElementsByClass(listingLinkClasses[i]);
+				for (int i = 0; i < listingLinkClasses.length; i++) {
+					Elements linkElements = doc.getElementsByClass(listingLinkClasses[i]);
 
-				for (Element linkElement : linkElements) {
-					if (linkElement != null) {
-						Elements originalListingLink = linkElement.select("a[href]");
+					for (Element linkElement : linkElements) {
+						if (linkElement != null) {
+							Elements originalListingLink = linkElement.select("a[href]");
 
-						for (Element link : originalListingLink) {
+							for (Element link : originalListingLink) {
 
-							String href = link.attr("href");
+								String href = link.attr("href");
 
-							if (!href.isEmpty()) {
+								if (!href.isEmpty()) {
 
-								// get the value from the href attribute
-								return scrapeListingEBay(href, isActiveListings);
+									// get the value from the href attribute
+									return scrapeListingEBay(href, isActiveListings);
+								}
+							}
+						}
+
+					}
+
+				}
+
+				Element priceElement = null;
+				double price = 0;
+
+				String[] priceIDs = { "prcIsum", "prcIsum_bidPrice", "mm-saleDscPrc" };
+
+				for (int i = 0; i < priceIDs.length; i++) {
+					priceElement = doc.getElementById(priceIDs[i]);
+
+					if (priceElement != null) {
+						if (priceIDs[i].equals("prcIsum_bidPrice")) {
+							listingType = ProductListing.AUCTION_LISTING;
+						}
+						break;
+					}
+
+				}
+
+				if (priceElement == null) {
+					isSuccessful = false;
+				} else {
+					String fullPriceStr = priceElement.text();
+					Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
+					Matcher priceMatcher = pricePattern.matcher(fullPriceStr.replace(",", ""));
+					if (priceMatcher.find()) {
+
+						Pattern currencyPattern = Pattern.compile("^[A-Z]+");
+						Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
+						currencyMatcher.find();
+						String currency = currencyMatcher.group(0);
+
+						if (currency.equals("US") == false) {
+							Element convPriceElement = doc.getElementById("convbinPrice");
+							if (convPriceElement == null) {
+								convPriceElement = doc.getElementById("convbidPrice");
+							}
+							fullPriceStr = convPriceElement.text();
+						}
+
+						//TODO - fix price formatting for certain situations with formatting (temporary solution is below)
+						try {
+							price = Double.parseDouble(fullPriceStr.replaceAll("[a-z]+|[A-Z]+|[\\$ ,\\(\\)]", ""));
+						}
+						catch (NumberFormatException e) {
+							price = 999999;
+
+						}
+
+					}
+
+					// Scrape image URL
+					Element imageElement = doc.getElementById("icImg");
+					String imgURL = imageElement.attr("src");
+
+					// Scrape shipping price
+
+					Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
+					String shippingPriceStr = shippingPriceElement.text();
+					Pattern shippingPricePattern = Pattern.compile("^[A-Z]+");
+					Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
+
+					if (shippingPriceMatcher.find() && shippingPriceStr != null) {
+						String currency = shippingPriceMatcher.group(0);
+						if (currency.equals("US") == false) {
+							//TODO - fix problem with unreadable shipping prices from terrible formatting (a more temporary try catch situation is used below)
+							try {
+								shippingPriceStr = doc.getElementById("convetedPriceId").text();
+							}
+							catch(NullPointerException e) {
+								shippingPriceStr = "0";
+
 							}
 						}
 					}
 
-				}
+					// Reformat shipping price to a double
+					double shippingPrice = 0;
 
-			}
-
-			Element priceElement = null;
-			double price = 0;
-
-			String[] priceIDs = { "prcIsum", "prcIsum_bidPrice", "mm-saleDscPrc" };
-
-			for (int i = 0; i < priceIDs.length; i++) {
-				priceElement = doc.getElementById(priceIDs[i]);
-
-				if (priceElement != null) {
-					if (priceIDs[i].equals("prcIsum_bidPrice")) {
-						listingType = ProductListing.AUCTION_LISTING;
-					}
-					break;
-				}
-
-			}
-
-			if (priceElement == null) {
-				isSuccessful = false;
-			} else {
-				String fullPriceStr = priceElement.text();
-				Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
-				Matcher priceMatcher = pricePattern.matcher(fullPriceStr.replace(",", ""));
-				if (priceMatcher.find()) {
-
-					Pattern currencyPattern = Pattern.compile("^[A-Z]+");
-					Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
-					currencyMatcher.find();
-					String currency = currencyMatcher.group(0);
-
-					if (currency.equals("US") == false) {
-						Element convPriceElement = doc.getElementById("convbinPrice");
-						if (convPriceElement == null) {
-							convPriceElement = doc.getElementById("convbidPrice");
-						}
-						fullPriceStr = convPriceElement.text();
-					}
-					
-					//TODO - fix price formatting for certain situations with formatting (temporary solution is below)
 					try {
-						price = Double.parseDouble(fullPriceStr.replaceAll("[a-z]+|[A-Z]+|[\\$ ,\\(\\)]", ""));
+						shippingPrice = Double.parseDouble(shippingPriceStr.replaceAll("[A-Z]+|[\\$ ,]", ""));
 					}
-					catch (NumberFormatException e) {
-						price = 999999;
-						
+					//TODO - fix problem when shipping price is in an unreadable (a more temporary solution is below)
+					catch (NumberFormatException e){
+						shippingPrice = 0;
 					}
-			
+
+					// Scrape the location of the listing
+					Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
+					String location = availableLocation.text();
+
+					// Create scrapedListing
+					scrapedListing = new ProductListing(imgURL, price, shippingPriceStr, location, title, productURL,
+							listingType, ProductListing.EBAY, tags);
+
 				}
-
-				// Scrape image URL
-				Element imageElement = doc.getElementById("icImg");
-				String imgURL = imageElement.attr("src");
-
-				// Scrape shipping price
-
-				Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
-				String shippingPriceStr = shippingPriceElement.text();
-				Pattern shippingPricePattern = Pattern.compile("^[A-Z]+");
-				Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
-
-				if (shippingPriceMatcher.find() && shippingPriceStr != null) {
-					String currency = shippingPriceMatcher.group(0);
-					if (currency.equals("US") == false) {
-						//TODO - fix problem with unreadable shipping prices from terrible formatting (a more temporary try catch situation is used below)
-						try {
-						shippingPriceStr = doc.getElementById("convetedPriceId").text();
-						}
-						catch(NullPointerException e) {
-							shippingPriceStr = "0";
-
-						}
-					}
-				}
-
-				// Reformat shipping price to a double
-				double shippingPrice = 0;
-				
-				try {
-				shippingPrice = Double.parseDouble(shippingPriceStr.replaceAll("[A-Z]+|[\\$ ,]", ""));
-				}
-				//TODO - fix problem when shipping price is in an unreadable (a more temporary solution is below)
-				catch (NumberFormatException e){
-					shippingPrice = 0;
-				}
-
-				// Scrape the location of the listing
-				Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
-				String location = availableLocation.text();
-
-				// Create scrapedListing
-				scrapedListing = new ProductListing(imgURL, price, shippingPriceStr, location, title, productURL,
-						listingType, ProductListing.EBAY, tags);
-
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-
-		if (isSuccessful && isActiveListings) {
-			scrapedListing.setIsSold(false);
-			activeAdListings.add(scrapedListing);
-		} else if (isSuccessful && !isActiveListings) {
-			scrapedListing.setIsSold(true);
-			soldAdListings.add(scrapedListing);
+		catch (SocketTimeoutException e) {
+			isSuccessful = false;
 		}
-
-		return isSuccessful;
+	} catch (IOException e) {
+		e.printStackTrace();
 	}
 
-	/**
-	 * This method scrapes search results from kjiji
-	 * 
-	 * @param searchURL The search URL for the user's keywords
-	 */
-	private void scrapeSearchResultsKijiji(String searchURL) {
-		ArrayList<ProductListing> listingSearchResults = new ArrayList<ProductListing>();
-		// TODO: check what ?dc=true means
-		// Here we create a document object and use JSoup to fetch the website
-		Document doc;
+	if (isSuccessful && isActiveListings) {
+		scrapedListing.setIsSold(false);
+		activeAdListings.add(scrapedListing);
+	} else if (isSuccessful && !isActiveListings) {
+		scrapedListing.setIsSold(true);
+		soldAdListings.add(scrapedListing);
+	}
+
+	return isSuccessful;
+}
+
+/**
+ * This method scrapes search results from kjiji
+ * 
+ * @param searchURL The search URL for the user's keywords
+ */
+private void scrapeSearchResultsKijiji(String searchURL) {
+	ArrayList<ProductListing> listingSearchResults = new ArrayList<ProductListing>();
+	// TODO: check what ?dc=true means
+	// Here we create a document object and use JSoup to fetch the website
+	Document doc;
+	try {
+		doc = Jsoup.connect(searchURL).get();
+
+		// Get the list of repositories
+		Elements numMatches = doc.getElementsByClass("showing");
+
+		System.out.println(numMatches.text());
+		Pattern r = Pattern.compile("([0-9],?)+ Ad");
+		Matcher m = r.matcher(numMatches.text());
+		if (m.find()) {
+			System.out.println(m.group(0).replaceAll("[ Ad,]", ""));
+		}
+
+		// Get the list of repositories
+		Elements searchItems = doc.getElementsByClass("regular-ad");
+		int counter = 1;
+
+		for (Element searchItem : searchItems) {
+
+			Element link = searchItem.select("a[href]").first();
+			String href = link.attr("href");
+
+			if (!href.isEmpty()) {
+
+				if (href.contains("https:")) {
+					System.out.println("\nlink " + counter + ": " + href);
+					System.out.println("Cannot access links that are not from https://www.kijiji.ca");
+				} else {
+					System.out.println("\nlink " + counter + ": " + "https://www.kijiji.ca" + href);
+
+					// get the value from the href attribute
+					scrapeListingKijiji("https://www.kijiji.ca" + href);
+				}
+				counter++;
+			}
+		}
+
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
+
+/**
+ * This method scrapes listings from kijiji
+ * 
+ * @param productURL The URL for the product listing
+ */
+private boolean scrapeListingKijiji(String productURL) {
+	ProductListing scrapedListing = new ProductListing();
+	ArrayList<String> tags = new ArrayList<String>();
+	boolean isSuccessful = true;
+	try {
+
+		Document listing = Jsoup.connect(productURL).get();
+
+		// Scrape title:
+		Element titleELement = listing.getElementsByClass("title-2323565163").first();
+		String title;
+
 		try {
-			doc = Jsoup.connect(searchURL).get();
-
-			// Get the list of repositories
-			Elements numMatches = doc.getElementsByClass("showing");
-
-			System.out.println(numMatches.text());
-			Pattern r = Pattern.compile("([0-9],?)+ Ad");
-			Matcher m = r.matcher(numMatches.text());
-			if (m.find()) {
-				System.out.println(m.group(0).replaceAll("[ Ad,]", ""));
-			}
-
-			// Get the list of repositories
-			Elements searchItems = doc.getElementsByClass("regular-ad");
-			int counter = 1;
-
-			for (Element searchItem : searchItems) {
-
-				Element link = searchItem.select("a[href]").first();
-				String href = link.attr("href");
-
-				if (!href.isEmpty()) {
-
-					if (href.contains("https:")) {
-						System.out.println("\nlink " + counter + ": " + href);
-						System.out.println("Cannot access links that are not from https://www.kijiji.ca");
-					} else {
-						System.out.println("\nlink " + counter + ": " + "https://www.kijiji.ca" + href);
-
-						// get the value from the href attribute
-						scrapeListingKijiji("https://www.kijiji.ca" + href);
-					}
-					counter++;
-				}
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			title = titleELement.text();
 		}
-	}
-
-	/**
-	 * This method scrapes listings from kijiji
-	 * 
-	 * @param productURL The URL for the product listing
-	 */
-	private boolean scrapeListingKijiji(String productURL) {
-		ProductListing scrapedListing = new ProductListing();
-		ArrayList<String> tags = new ArrayList<String>();
-		boolean isSuccessful = true;
+		catch(NullPointerException e) {
+			title = "No Name Found";
+		}
+		// Scrape price:
+		Element priceElement = listing.getElementsByClass("currentPrice-2842943473").first();
+		String priceStr;
 		try {
-
-			Document listing = Jsoup.connect(productURL).get();
-
-			// Scrape title:
-			Element titleELement = listing.getElementsByClass("title-2323565163").first();
-			String title;
-			
-			try {
-				title = titleELement.text();
-			}
-			catch(NullPointerException e) {
-				title = "No Name Found";
-			}
-			// Scrape price:
-			Element priceElement = listing.getElementsByClass("currentPrice-2842943473").first();
-			String priceStr;
-			try {
-				priceStr= priceElement.text().replaceAll("[\\$,]", "").replace("Free", "0");
-			}
-			catch(NullPointerException e) {
-				priceStr = "0";
-				isSuccessful = false;
-			}
-			// Price of the product
-			double price = 0;
-
-			// Using regix to filter out unwanted information from the variable
-			Pattern r = Pattern.compile("[0-9]+\\.[0-9]{2}");
-			Matcher m = r.matcher(priceStr);
-
-			// If there is no price, just skip the listing (please contact means you have to
-			// contact for the price)
-			if (priceStr.equals("Please Contact") || !m.find()) {
-
-				// Checking if the web scraper was able to pull successful listings without a
-				// "Please Contact" for the price
-				isSuccessful = false;
-			} else {
-				priceStr = m.group();
-				price = Double.parseDouble(priceStr);
-			}
-
-			// Scrape image URL
-			String imageURL = "";
-			try {
-				Element presentation = listing.getElementById("mainHeroImage");
-				Element image = presentation.getElementsByTag("img").first();
-				imageURL = image.attr("src");
-			} catch (NullPointerException e) {
-				System.out.println("No image found");
-				isSuccessful = false;
-			}
-
-			// Can't ship orders for kijii
-			String orderMethod = "PICK UP ONLY";
-
-			// Scrape the location of the listing
-			Elements availableLocation = listing.getElementsByAttributeValue("itemprop", "address");
-			String location = availableLocation.text();
-
-			// Create scrapedListing
-			scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL,
-					ProductListing.BUY_IT_NOW_LISTING, ProductListing.KIJIJI, tags);
-
-			// In case of any IO errors, we want the messages written to the console
-		} catch (IOException e) {
-			e.printStackTrace();
+			priceStr= priceElement.text().replaceAll("[\\$,]", "").replace("Free", "0");
 		}
-		if (isSuccessful) {
-			activeAdListings.add(scrapedListing);
+		catch(NullPointerException e) {
+			priceStr = "0";
+			isSuccessful = false;
+		}
+		// Price of the product
+		double price = 0;
+
+		// Using regix to filter out unwanted information from the variable
+		Pattern r = Pattern.compile("[0-9]+\\.[0-9]{2}");
+		Matcher m = r.matcher(priceStr);
+
+		// If there is no price, just skip the listing (please contact means you have to
+		// contact for the price)
+		if (priceStr.equals("Please Contact") || !m.find()) {
+
+			// Checking if the web scraper was able to pull successful listings without a
+			// "Please Contact" for the price
+			isSuccessful = false;
+		} else {
+			priceStr = m.group();
+			price = Double.parseDouble(priceStr);
 		}
 
-		return isSuccessful;
+		// Scrape image URL
+		String imageURL = "";
+		try {
+			Element presentation = listing.getElementById("mainHeroImage");
+			Element image = presentation.getElementsByTag("img").first();
+			imageURL = image.attr("src");
+		} catch (NullPointerException e) {
+			System.out.println("No image found");
+			isSuccessful = false;
+		}
+
+		// Can't ship orders for kijii
+		String orderMethod = "PICK UP ONLY";
+
+		// Scrape the location of the listing
+		Elements availableLocation = listing.getElementsByAttributeValue("itemprop", "address");
+		String location = availableLocation.text();
+
+		// Create scrapedListing
+		scrapedListing = new ProductListing(imageURL, price, orderMethod, location, title, productURL,
+				ProductListing.BUY_IT_NOW_LISTING, ProductListing.KIJIJI, tags);
+
+		// In case of any IO errors, we want the messages written to the console
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+	if (isSuccessful) {
+		activeAdListings.add(scrapedListing);
 	}
 
-	/**
-	 * Get the active listings
-	 * 
-	 * @return (ArrayList<ProductListing>) The active listings
-	 */
-	public ArrayList<ProductListing> getActiveAdListings() {
-		return activeAdListings;
-	}
+	return isSuccessful;
+}
 
-	/**
-	 * Get the sold listings
-	 * 
-	 * @return (ArrayList<ProductListing>) The sold listings
-	 */
-	public ArrayList<ProductListing> getSoldAdListings() {
-		return soldAdListings;
-	}
+/**
+ * Get the active listings
+ * 
+ * @return (ArrayList<ProductListing>) The active listings
+ */
+public ArrayList<ProductListing> getActiveAdListings() {
+	return activeAdListings;
+}
 
-	/**
-	 * Set the keywords
-	 * 
-	 * @param keywords (String) The keywords to set to
-	 */
-	public void setKeyWords(String keywords) {
-		this.keywords = keywords;
-	}
+/**
+ * Get the sold listings
+ * 
+ * @return (ArrayList<ProductListing>) The sold listings
+ */
+public ArrayList<ProductListing> getSoldAdListings() {
+	return soldAdListings;
+}
+
+/**
+ * Set the keywords
+ * 
+ * @param keywords (String) The keywords to set to
+ */
+public void setKeyWords(String keywords) {
+	this.keywords = keywords;
+}
 }

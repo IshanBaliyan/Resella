@@ -12,8 +12,6 @@ Then, the program allows the user to organize the information by calculating the
 Furthermore, individuals can use the program to find less expensive products for a lower price (since some people just want to get rid of their old stuff at a overly low price) and the user of the program could theortically RESELL it back on EBay/kijiji for a higher price.
 Thus, the name of the application is Resella.
 
-The program can scrape as many products as you want (although the code has been set to a default of 40 products on each marketplace) and theoretically, someone could run the program and potentitally find extremely low price listings after filtering through thousands of products in different marketplaces and resell them back on the marketplace.
-
 ![image](https://user-images.githubusercontent.com/43831507/100687724-d04b6600-334e-11eb-99d9-f282f6096103.png)
 
 The user can also filter certain information to get a desired listing that only have those features (e.g. preferred location for pickup, preferred product colour, preferred manufacturing date, preferred size, etc...)
@@ -24,6 +22,8 @@ Below is an example of filtering "controller" when "Playstation 5" was the keywo
 
 The user can also browse images of the products up close:
 ![image](https://user-images.githubusercontent.com/43831507/100687838-0b4d9980-334f-11eb-83b4-06dae67b484d.png)
+
+The program can scrape as many products as you want (although the code has been set to a default of 40 products on each marketplace) and theoretically, someone could run the program and potentitally find extremely low price listings after filtering through thousands of products in different marketplaces and resell them back on the marketplace.
 
 Note: The program was required to be submitted in Java and we used the JavaFx library to build the program. However, after submitting the program, we decided to navigate our program to Node.js and are currently developing a final for-sale version of the software (private repo) in a business.
 

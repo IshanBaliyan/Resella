@@ -210,9 +210,9 @@ public class WebScraper {
 			} else {
 				String fullPriceStr = priceElement.text();
 				Pattern pricePattern = Pattern.compile("[0-9]+\\.[0-9]+");
-				Matcher priceMatcher = pricePattern.matcher(fullPriceStr);
-
+				Matcher priceMatcher = pricePattern.matcher(fullPriceStr.replace(",", ""));
 				if (priceMatcher.find()) {
+
 					Pattern currencyPattern = Pattern.compile("^[A-Z]+");
 					Matcher currencyMatcher = currencyPattern.matcher(fullPriceStr);
 					currencyMatcher.find();
@@ -234,7 +234,7 @@ public class WebScraper {
 						price = 999999;
 						
 					}
-					
+			
 				}
 
 				// Scrape image URL
@@ -242,12 +242,12 @@ public class WebScraper {
 				String imgURL = imageElement.attr("src");
 
 				// Scrape shipping price
+
 				Elements shippingPriceElement = doc.getElementsByClass("u-flL sh-col");
 				String shippingPriceStr = shippingPriceElement.text();
 				Pattern shippingPricePattern = Pattern.compile("^[A-Z]+");
 				Matcher shippingPriceMatcher = shippingPricePattern.matcher(shippingPriceStr);
 
-				System.out.println(shippingPriceStr);
 				if (shippingPriceMatcher.find() && shippingPriceStr != null) {
 					String currency = shippingPriceMatcher.group(0);
 					if (currency.equals("US") == false) {
@@ -257,6 +257,7 @@ public class WebScraper {
 						}
 						catch(NullPointerException e) {
 							shippingPriceStr = "0";
+
 						}
 					}
 				}
@@ -271,12 +272,13 @@ public class WebScraper {
 				catch (NumberFormatException e){
 					shippingPrice = 0;
 				}
+
 				// Scrape the location of the listing
 				Elements availableLocation = doc.getElementsByAttributeValue("itemprop", "availableAtOrFrom");
 				String location = availableLocation.text();
 
 				// Create scrapedListing
-				scrapedListing = new ProductListing(imgURL, price, "" + shippingPrice, location, title, productURL,
+				scrapedListing = new ProductListing(imgURL, price, shippingPriceStr, location, title, productURL,
 						listingType, ProductListing.EBAY, tags);
 
 			}

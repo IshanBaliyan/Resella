@@ -2,7 +2,7 @@
 
 ## This is a web scraper that scrapes websites, such as EBay and Kijiji, for listings of products and organizes them for the best deals.
 
-The application was made as an assignment for the course ICS 4U (Grade 12 Computer Science) and the two authors are Ishan Baliyan and John Wolf.
+The application was made as an assignment for the course ICS 4U (Grade 12 Computer Science) and the two authors are Ishan Baliyan and John Wolf. As seen by the insights, the project took several months to make.
 
 The program scrapes information for online products such as name, location, image, auction listing, link, price, shipping price and more (while also filtering out sponsored listings).
 Then, the program allows the user to organize the information by calculating the average sell price of the product and determine which products are the best deal and below market-value.
@@ -15,11 +15,13 @@ The program can scrape as many products as you want (although the code has been 
 ![image](https://user-images.githubusercontent.com/43831507/100687724-d04b6600-334e-11eb-99d9-f282f6096103.png)
 
 The user can also filter certain information to get a desired listing that only have those features (e.g. preferred location for pickup, preferred product colour, preferred manufacturing date, preferred size, etc...)
+![image](https://user-images.githubusercontent.com/43831507/100688399-40a6b700-3350-11eb-874f-748954ad93e1.png)
+
+Below is an example of filtering "controller" when "Playstation 5" was the keyword searched on the program
 ![image](https://user-images.githubusercontent.com/43831507/100688065-7a2af280-334f-11eb-88d2-3334a46b66ef.png)
 
-The user can browse images of the products up close
+The user can also browse images of the products up close:
 ![image](https://user-images.githubusercontent.com/43831507/100687838-0b4d9980-334f-11eb-83b4-06dae67b484d.png)
-
 
 Note: The program was required to be submitted in Java and we used the JavaFx library to build the program. However, after submitting the program, we decided to navigate our program to Node.js and are currently developing a final for-sale version of the software (private repo) in a business.
 

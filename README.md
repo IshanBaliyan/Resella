@@ -25,6 +25,6 @@ The user can also browse images of the products up close:
 
 The program can scrape as many products as you want (although the code has been set to a default of 40 products on each marketplace) and theoretically, someone could run the program and potentitally find extremely low price listings after filtering through thousands of products in different marketplaces and resell them back on the marketplace.
 
-Note: The program was required to be submitted in Java and we used the JavaFx library to build the program. However, after submitting the program, we decided to navigate our program to Node.js and are currently developing a final for-sale version of the software (private repo) as a Business.
+Note: The program was required to be submitted in Java and we used the JavaFx library to build the program. However, after submitting the program, we decided to navigate our program to JavaScript (Node.js) and are currently developing a final for-sale version of the software (private repo) as a Business.
 
 

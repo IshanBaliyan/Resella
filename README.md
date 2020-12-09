@@ -4,9 +4,7 @@
 
 ## This is a web scraper that scrapes websites, such as EBay and Kijiji, for listings of products and organizes them for the best deals.
 
-The application was made as an assignment for the course ICS 4U (Grade 12 Computer Science) and the two authors are Ishan Baliyan and John Wolf. As seen by the program *insights* on GitHub, the project took several months to build. 
-
-Note:This is Version 1 of the program. We are currently developing an enhanced Version 2 of this program with Node.JS (private repo) as software for sale in a business.
+The application was made as an assignment for the course ICS 4U (Grade 12 Computer Science) and the two authors are Ishan Baliyan and John Wolf. As seen by the program *insights* on GitHub, the project took several months to build. This following is Version 1 of the program. We are currently developing an enhanced Version 2 of this program with Node.JS (private repo) as software for sale in a business.
 
 The program scrapes information for online products such as name, location, image, auction listing, link, price, shipping price and more (while also filtering out sponsored listings).
 Then, the program allows the user to organize the information by calculating the average sell price of the product and determining which products are the best deal and below market-value.

@@ -8,7 +8,7 @@ The application was made as an assignment for the course ICS 4U (Grade 12 Comput
 
 Note: We are developing an enhanced Version 2 of this program with Node.JS (in a private repo) as software for sale in a business. The following is Version 1 in java.
 
-**Overview:** The program scrapes information for online products such as name, location, image, auction listing, link, price, shipping price and more (while also filtering out sponsored listings).
+#**Overview:**# The program scrapes information for online products such as name, location, image, auction listing, link, price, shipping price and more (while also filtering out sponsored listings).
 Then, the program allows the user to organize the information by calculating the average sell price of the product and determining which products are the best deal and below market-value.
 
 Furthermore, individuals can use the program to find less expensive products for a lower price (since some people just want to get rid of their old stuff at a overly low price) and the user of the program could theortically RESELL it back on EBay/kijiji for a higher price.

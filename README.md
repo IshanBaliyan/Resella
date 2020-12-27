@@ -4,11 +4,11 @@
 
 ## This is a web scraper that scrapes websites, such as EBay and Kijiji, for listings of products and organizes them for the best deals.
 
+## Company Website: https://resellacompany.wixsite.com/resella ##
+
 The application was made as an assignment for the course ICS 4U (Grade 12 Computer Science) and the two authors are Ishan Baliyan and John Wolf. As seen by the program *insights* on GitHub, the project took several months to build. 
 
 Note: We are developing an enhanced Version 2 of this program with Node.JS (in a private repo) as software for sale in a business. The following is Version 1 in java.
-
-##Company Website: https://resellacompany.wixsite.com/resella ##
 
 ### Overview: 
 The program scrapes information for online products such as name, location, image, auction listing, link, price, shipping price and more (while also filtering out sponsored listings).

@@ -17,6 +17,8 @@ Then, the program allows the user to organize the information by calculating the
 Furthermore, individuals can use the program to find less expensive products for a lower price (since some people just want to get rid of their old stuff at a overly low price) and the user of the program could theortically RESELL it back on EBay/kijiji for a higher price.
 Thus, the name of the application is Resella.
 
+![image](https://user-images.githubusercontent.com/43831507/153688325-5b2e230e-5d71-455c-a8ea-2056a0c9d0cb.png)
+
 ![image](https://user-images.githubusercontent.com/43831507/100687724-d04b6600-334e-11eb-99d9-f282f6096103.png)
 
 The user can also filter certain information to get a desired listing that only have those features (e.g. preferred location for pickup, preferred product colour, preferred manufacturing date, preferred size, etc...)

@@ -19,7 +19,7 @@ Thus, the name of the application is Resella.
 
 ![image](https://user-images.githubusercontent.com/43831507/153688325-5b2e230e-5d71-455c-a8ea-2056a0c9d0cb.png)
 
-![image](https://user-images.githubusercontent.com/43831507/100687724-d04b6600-334e-11eb-99d9-f282f6096103.png)
+![image](https://user-images.githubusercontent.com/43831507/153688529-4f3dce45-469f-4ffb-8b21-403ac521868c.png)
 
 The user can also filter certain information to get a desired listing that only have those features (e.g. preferred location for pickup, preferred product colour, preferred manufacturing date, preferred size, etc...)
 ![image](https://user-images.githubusercontent.com/43831507/100688399-40a6b700-3350-11eb-874f-748954ad93e1.png)

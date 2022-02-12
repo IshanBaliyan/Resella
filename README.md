@@ -22,7 +22,7 @@ Thus, the name of the application is Resella.
 ![image](https://user-images.githubusercontent.com/43831507/153688529-4f3dce45-469f-4ffb-8b21-403ac521868c.png)
 
 The user can also filter certain information to get a desired listing that only have those features (e.g. preferred location for pickup, preferred product colour, preferred manufacturing date, preferred size, etc...)
-![image](https://user-images.githubusercontent.com/43831507/100688399-40a6b700-3350-11eb-874f-748954ad93e1.png)
+![image](https://user-images.githubusercontent.com/43831507/153688616-ceebde1e-9800-4102-980f-df3e44309a46.png)
 
 Below is an example of filtering "controller" when "Playstation 5" was the keyword searched on the program
 ![image](https://user-images.githubusercontent.com/43831507/100688065-7a2af280-334f-11eb-88d2-3334a46b66ef.png)

@@ -24,11 +24,8 @@ Thus, the name of the application is Resella.
 The user can also filter certain information to get a desired listing that only have those features (e.g. preferred location for pickup, preferred product colour, preferred manufacturing date, preferred size, etc...)
 ![image](https://user-images.githubusercontent.com/43831507/153688616-ceebde1e-9800-4102-980f-df3e44309a46.png)
 
-Below is an example of filtering "controller" when "Playstation 5" was the keyword searched on the program
-![image](https://user-images.githubusercontent.com/43831507/100688065-7a2af280-334f-11eb-88d2-3334a46b66ef.png)
-
-The user can also browse images of the products up close:
-![image](https://user-images.githubusercontent.com/43831507/100687838-0b4d9980-334f-11eb-83b4-06dae67b484d.png)
+Below is an example of filtering "controller" when "Playstation 5" was the keyword searched on the program (the user can also browse images of the products up close)
+![image](https://user-images.githubusercontent.com/43831507/153688868-cc9d76c6-a3cd-46e8-bf14-b2cf5bf5e418.png)
 
 The program can scrape as many products as you want (although the code has been set to a default of 40 products on each marketplace) and theoretically, someone could run the program and potentitally find extremely low price listings after filtering through thousands of products in different marketplaces and resell them back on the marketplace.
 
